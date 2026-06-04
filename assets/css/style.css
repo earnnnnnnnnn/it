@@ -1,0 +1,612 @@
+:root {
+    --primary-color: #4361ee;
+    --primary-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+    --secondary-color: #3f37c9;
+    --accent-color: #4cc9f0;
+    --success-color: #4cc9f0;
+    --warning-color: #f72585;
+    --danger-color: #ef4444;
+    --dark-bg: #0f172a;
+    --sidebar-bg: #ffffff;
+    --card-bg: #ffffff;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    --border-color: #f1f5f9;
+    --radius-sm: 10px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+html {
+    /* Fluid Typography: ปรับขนาดฟอนต์ของทั้งเว็บตามขนาดหน้าจอ (clamp) 
+       - ขั้นต่ำ: 14px (มือถือ)
+       - ปกติ: คำนวณขยายแบบยืดหยุ่น (0.5vw + 12px)
+       - สูงสุด: 18px (จอใหญ่) 
+       ค่านี้จะส่งผลต่อหน่วย rem ทั้งหมดใน Bootstrap */
+    font-size: clamp(14px, 0.5vw + 12px, 18px);
+}
+
+body {
+    font-family: 'Inter', 'Sarabun', sans-serif;
+    background-color: #f8fafc;
+    color: var(--text-main);
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+}
+
+/* Sidebar Styling */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background: var(--sidebar-bg);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1045;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--text-main);
+    border-right: 1px solid var(--border-color);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.03);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.sidebar-menu {
+    padding: 0 1.25rem;
+    list-style: none;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.menu-item {
+    margin-bottom: 8px;
+}
+
+.menu-link {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    color: var(--text-muted);
+    text-decoration: none !important;
+    border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    gap: 14px;
+    font-weight: 500;
+}
+
+.menu-link:hover {
+    background: #f1f5f9;
+    color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.menu-link.active {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
+}
+
+.menu-link i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+}
+
+/* Main Content Area */
+.main-content {
+    margin-left: 280px;
+    padding: 1.25rem 2.5rem 2.5rem 2.5rem;
+    min-height: 100vh;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Premium Cards */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: white;
+}
+
+.card-hover:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(67, 97, 238, 0.2);
+}
+
+.stat-card {
+    padding: 1.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover .stat-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* Glassmorphism */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+}
+
+/* Buttons */
+.btn {
+    border-radius: var(--radius-sm);
+    padding: 10px 24px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(67, 97, 238, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(67, 97, 238, 0.3);
+    background: linear-gradient(135deg, #3a0ca3 0%, #4361ee 100%);
+}
+
+.btn-rounded {
+    border-radius: 50px;
+}
+
+/* Table Styling */
+.table {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.table tr {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    border-radius: var(--radius-sm);
+}
+
+.table td,
+.table th {
+    padding: 1.25rem 1rem;
+    border: none !important;
+}
+
+.table thead th {
+    background: transparent;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* Login Page Specific */
+.login-container {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, #4361ee 0%, #0f172a 60%);
+    position: relative;
+    overflow: hidden;
+}
+
+.login-container::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('https://www.transparenttextures.com/patterns/cubes.png');
+    opacity: 0.1;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 3rem;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+/* Badges */
+.badge {
+    padding: 6px 12px;
+    font-weight: 600;
+    border-radius: 6px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Sidebar Backdrop for mobile/tablet */
+.sidebar-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(15, 23, 42, 0.4); /* slate-900 with opacity */
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 1040;
+    opacity: 0;
+    display: none;
+    transition: opacity 0.3s ease;
+}
+.sidebar-backdrop.show {
+    opacity: 1;
+    display: block !important;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .sidebar {
+        left: -280px;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 1.25rem;
+    }
+
+    .sidebar.show {
+        left: 0;
+    }
+    
+    .top-navbar h3 {
+        font-size: 1.5rem !important;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Hero section responsive sizes */
+    .hero-gradient {
+        padding: 1.75rem 1.25rem;
+        margin-bottom: 1.5rem;
+    }
+    .hero-gradient h1 {
+        font-size: 2rem !important;
+    }
+    .hero-gradient p {
+        font-size: 0.95rem !important;
+    }
+    
+    /* Stats cards spacing */
+    .stat-card {
+        padding: 1.25rem;
+    }
+    
+    /* Custom Scanned Item Grid stack layout for borrow.php & others */
+    .card-list-headers {
+        display: none !important;
+    }
+    
+    .scanned-item-card {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+        padding: 1.25rem !important;
+        text-align: center !important;
+        justify-items: center !important;
+    }
+    
+    .scanned-item-card .img-container {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+    
+    .scanned-item-card .serial-text {
+        font-size: 0.85rem !important;
+    }
+    
+    .scanned-item-card .status-group {
+        align-items: center !important;
+    }
+    
+    .scanned-item-card .text-end {
+        text-align: center !important;
+        width: 100% !important;
+        margin-top: 0.25rem !important;
+    }
+    
+    /* Tables wrap styling */
+    .table td, .table th {
+        padding: 0.75rem 0.5rem !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Hero Section */
+.hero-gradient {
+    background: linear-gradient(135deg, #4361ee 0%, #4cc9f0 100%);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.hero-gradient::after {
+    content: '';
+    position: absolute;
+    right: -50px;
+    bottom: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* Orange Theme for Scanning */
+.bg-orange {
+    background-color: #f97316 !important;
+}
+
+.border-orange {
+    border-color: #f97316 !important;
+}
+
+.text-orange {
+    color: #f97316 !important;
+}
+
+.bg-orange-light {
+    background-color: #fff7ed !important;
+}
+
+.scan-focus:focus {
+    border-color: #f97316 !important;
+    box-shadow: 0 0 0 0.25rem rgba(249, 115, 22, 0.25) !important;
+    background-color: #fff7ed !important;
+}
+
+@keyframes scan-glow {
+    0% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+    }
+
+    50% {
+        box-shadow: 0 0 15px 2px rgba(249, 115, 22, 0.3);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+    }
+}
+
+.animate-scan-border {
+    animation: scan-glow 2s infinite ease-in-out;
+}
+
+
+/* Settings Vertical Menu */
+.settings-sidebar {
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.settings-sidebar-header {
+    background: #6366f1;
+    /* Indigo/Purple from screenshot */
+    color: #fff;
+    padding: 18px 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.settings-menu .list-group-item {
+    border: none;
+    padding: 15px 25px;
+    font-weight: 600;
+    color: #8b96a5;
+    transition: all 0.3s ease;
+    background: transparent;
+}
+
+.settings-menu .list-group-item:hover {
+    background: #f8fafc;
+    color: #6366f1;
+    padding-left: 30px;
+}
+
+.settings-menu .list-group-item.active {
+    background: #eef2ff;
+    color: #6366f1;
+    border-left: 4px solid #6366f1;
+    padding-left: 30px;
+}
+
+
+/* Sidebar Accordion Arrow Rotation */
+.menu-link .fa-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+.menu-link[aria-expanded="false"] .fa-chevron-down {
+    transform: rotate(-90deg);
+    /* Points Right */
+}
+
+.menu-link[aria-expanded="true"] .fa-chevron-down {
+    transform: rotate(0deg);
+    /* Points Down */
+}
+
+
+/* Custom Tab Styling for Settings */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color) !important;
+}
+
+.nav-tabs .nav-link {
+    color: var(--text-main) !important;
+    /* Inactive: Black/Dark */
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    padding: 12px 20px !important;
+    transition: all 0.3s ease !important;
+    background: transparent !important;
+}
+
+.nav-tabs .nav-link i {
+    color: var(--text-muted) !important;
+    /* Icon Inactive: Muted/Dark */
+    transition: all 0.3s ease !important;
+}
+
+.nav-tabs .nav-link:hover {
+    color: var(--primary-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--primary-color) !important;
+    /* Active: Blue */
+    border-bottom: 3px solid var(--primary-color) !important;
+}
+
+.nav-tabs .nav-link.active i {
+    color: var(--primary-color) !important;
+    /* Icon Active: Blue */
+}
+
+/* Submenu behavior when collapsed is handled in media query below */
+
+/* Collapsible Desktop Sidebar Layout (Slidebar) */
+@media (min-width: 992px) {
+    body.sidebar-is-collapsed .sidebar {
+        width: 80px !important;
+        left: 0 !important;
+    }
+    body.sidebar-is-collapsed .main-content {
+        margin-left: 80px !important;
+    }
+    body.sidebar-is-collapsed .sidebar-header {
+        flex-direction: column !important;
+        padding: 1.5rem 0.5rem !important;
+        justify-content: center !important;
+        gap: 15px !important;
+    }
+    body.sidebar-is-collapsed .sidebar-header .ms-1 {
+        display: none !important;
+    }
+    body.sidebar-is-collapsed .sidebar-menu .text-muted.small {
+        display: none !important;
+    }
+    body.sidebar-is-collapsed .sidebar-menu {
+        padding: 0 !important;
+    }
+    body.sidebar-is-collapsed .menu-text,
+    body.sidebar-is-collapsed .sidebar .fa-chevron-down {
+        display: none !important;
+    }
+    body.sidebar-is-collapsed .menu-link {
+        justify-content: center !important;
+        width: 48px !important;
+        height: 48px !important;
+        padding: 0 !important;
+        margin: 0 auto 8px auto !important;
+        border-radius: var(--radius-md) !important;
+    }
+    body.sidebar-is-collapsed .menu-link:hover {
+        transform: scale(1.05) !important;
+    }
+    body.sidebar-is-collapsed .menu-link i {
+        margin: 0 !important;
+        font-size: 1.25rem !important;
+    }
+    
+    /* Center the sub-menu items when sidebar is collapsed */
+    body.sidebar-is-collapsed .collapse.show ul {
+        padding-left: 0 !important;
+        text-align: center;
+    }
+    
+    body.sidebar-is-collapsed .collapse.show .menu-link {
+        width: 42px !important;
+        height: 42px !important;
+        margin: 4px auto !important;
+    }
+}
+
+/* Sidebar Toggle Visibility Rules */
+#sidebarToggleNavbar {
+    display: none !important;
+}
+
+@media (max-width: 992px) {
+    #sidebarToggleNavbar {
+        display: flex !important; /* Always show in navbar on mobile/tablet */
+    }
+}
+
+/* Navbar toggle button is strictly for mobile. Desktop toggle remains below the logo in the sidebar. */
