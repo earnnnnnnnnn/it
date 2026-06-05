@@ -53,13 +53,14 @@ try {
 
         $image = uploadUserImage($_FILES['image'] ?? null);
 
+        $hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("INSERT INTO users (username, firstname, lastname, email, password, role, image) VALUES (?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
             $_POST['username'],
             $_POST['firstname'],
             $_POST['lastname'],
             $_POST['email'],
-            $_POST['password'],
+            $hashed_password,
             $_POST['role'] ?? 'USER',
             $image
         ]);
@@ -94,13 +95,14 @@ try {
 
         // Update with or without password
         if (!empty($_POST['password'])) {
+            $hashed_password = password_hash($_POST['password'], PASSWORD_DEFAULT);
             $sql = "UPDATE users SET username = ?, firstname = ?, lastname = ?, email = ?, password = ?, role = ? $image_sql WHERE id = ?";
             $params = array_merge([
                 $_POST['username'],
                 $_POST['firstname'],
                 $_POST['lastname'],
                 $_POST['email'],
-                $_POST['password'],
+                $hashed_password,
                 $_POST['role'] ?? 'USER'
             ], $image_params, [$id]);
             $stmt = $pdo->prepare($sql);

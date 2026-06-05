@@ -34,8 +34,7 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </head>
 <body>
     <script>
@@ -315,9 +314,7 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                                     </div>
 
                                     
-                                    <div class="mb-4 d-flex justify-content-center">
-                                        <div class="g-recaptcha" data-sitekey="<?= $_ENV['RECAPTCHA_SITE_KEY'] ?? '6Ld8NvEsAAAAAGVFW4Gw-1wbTAL_bo8x0EnRJzxV' ?>"></div>
-                                    </div>
+
 
                                     <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-3 rounded-pill shadow-sm">
                                         <i class="fas fa-right-to-bracket me-2"></i> เข้าสู่ระบบ
@@ -400,9 +397,7 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="mb-4 d-flex justify-content-center">
-                                        <div class="g-recaptcha" data-sitekey="<?= $_ENV['RECAPTCHA_SITE_KEY'] ?? '6Ld8NvEsAAAAAGVFW4Gw-1wbTAL_bo8x0EnRJzxV' ?>"></div>
-                                    </div>
+
                                     
                                     <button type="submit" class="btn btn-primary w-100 py-3 fw-bold mb-3 rounded-pill shadow-sm">
                                         <i class="fas fa-user-plus me-2"></i> สมัครสมาชิก
@@ -439,13 +434,13 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                         } else {
                             alert.text(response.error).removeClass('d-none');
                             btn.prop('disabled', false).html('<i class="fas fa-right-to-bracket me-2"></i> เข้าสู่ระบบ');
-                            if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+
                         }
                     },
                     error: function() {
                         alert.text('เกิดข้อผิดพลาดในการเชื่อมต่อ').removeClass('d-none');
                         btn.prop('disabled', false).html('<i class="fas fa-right-to-bracket me-2"></i> เข้าสู่ระบบ');
-                        if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+
                     }
                 });
             });
@@ -474,13 +469,13 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                         } else {
                             alert.text(response.error).addClass('alert-danger').removeClass('d-none');
                             btn.prop('disabled', false).html('<i class="fas fa-user-plus me-2"></i> สมัครสมาชิก');
-                            if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+
                         }
                     },
                     error: function() {
                         alert.text('เกิดข้อผิดพลาด').addClass('alert-danger').removeClass('d-none');
                         btn.prop('disabled', false).html('<i class="fas fa-user-plus me-2"></i> สมัครสมาชิก');
-                        if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+
                     }
                 });
             });

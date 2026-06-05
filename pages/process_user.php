@@ -27,8 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         exit;
     }
 
+    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     $stmt = $pdo->prepare("INSERT INTO users (username, firstname, lastname, email, password, role) VALUES (?, ?, ?, ?, ?, ?)");
-    if ($stmt->execute([$username, $firstname, $lastname, $email, $password, $role])) {
+    if ($stmt->execute([$username, $firstname, $lastname, $email, $hashed_password, $role])) {
         header('Location: users.php?success=1');
     } else {
         header('Location: users.php?error=failed');

@@ -56,12 +56,15 @@ require_once '../includes/header.php';
                                      data-sku="<?= htmlspecialchars($p['sku']) ?>" 
                                      data-image="<?= htmlspecialchars($p['image']) ?>"
                                      data-count="<?= $p['available_count'] ?>"
+                                     data-brand="<?= htmlspecialchars($p['brand']) ?>"
+                                     data-model="<?= htmlspecialchars($p['model']) ?>"
                                      style="cursor: pointer;">
                                     <div class="d-flex align-items-center justify-content-between">
                                         <div class="d-flex align-items-center gap-3">
                                             <img src="../assets/images/<?= $p['image'] ?>" class="rounded border" width="45" height="45" style="object-fit: cover;" onerror="this.src='../assets/images/default_product.png'">
                                             <div style="line-height: 1.2;">
                                                 <div class="fw-bold small text-dark"><?= htmlspecialchars($p['name']) ?></div>
+                                                <div class="text-muted mb-1" style="font-size: 10px;"><?= htmlspecialchars($p['brand']) ?> <?= htmlspecialchars($p['model']) ?></div>
                                                 <div class="text-primary" style="font-size: 11px;"><?= htmlspecialchars($p['sku']) ?></div>
                                             </div>
                                         </div>
@@ -85,6 +88,7 @@ require_once '../includes/header.php';
                         <div>
                             <div class="text-muted small fw-bold">สินค้าที่เลือก:</div>
                             <div class="fw-bold fs-6 text-dark" id="selectedProdName">-</div>
+                            <div class="text-muted small mb-1" id="selectedProdBrandModel" style="font-size: 0.8rem;"></div>
                             <div class="badge bg-primary-subtle text-primary border border-primary border-opacity-25" id="selectedProdSKU">-</div>
                         </div>
                     </div>
@@ -351,11 +355,12 @@ require_once '../includes/header.php';
             });
         });
 
-        function setProduct(id, name, sku, image, count) {
+        function setProduct(id, name, sku, image, count, brand, model) {
             selectedProductId = id;
             $('#productSelect').val(id);
             $('#selectedProductText').text(name);
             $('#selectedProdName').text(name);
+            $('#selectedProdBrandModel').text(brand + ' ' + model);
             $('#selectedProdSKU').text(sku);
             $('#selectedProdCount').text(count);
             $('#selectedProdImage').attr('src', '../assets/images/' + image);
@@ -369,7 +374,7 @@ require_once '../includes/header.php';
 
         $(document).on('click', '.product-option', function() {
             const d = $(this).data();
-            setProduct(d.id, d.name, d.sku, d.image, d.count);
+            setProduct(d.id, d.name, d.sku, d.image, d.count, d.brand, d.model);
         });
 
         // --- SKU Barcode Scan Logic ---
@@ -380,7 +385,7 @@ require_once '../includes/header.php';
                 const optSku = $(this).data('sku');
                 if (optSku && optSku.toString().toLowerCase() === sku.toLowerCase()) {
                     const d = $(this).data();
-                    setProduct(d.id, d.name, d.sku, d.image, d.count);
+                    setProduct(d.id, d.name, d.sku, d.image, d.count, d.brand, d.model);
                     found = true;
                     // Focus #serialInput immediately and prevent Swal from stealing/returning focus
                     setTimeout(() => $('#serialInput').focus(), 10);

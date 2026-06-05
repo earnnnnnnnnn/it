@@ -1029,6 +1029,9 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                                     <div class="text-muted" style="font-size: 0.85rem;">
                                         <?= htmlspecialchars($row['asset_number'] ?? '7440-001-0001-60-'.str_pad($row['id'] ?? rand(1, 99), 4, '0', STR_PAD_LEFT)) ?>
                                     </div>
+                                    <?php if (!empty($row['reason'])): ?>
+                                    <div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-comment-dots text-info me-1"></i><?= htmlspecialchars($row['reason']) ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="py-3 text-center">
                                     <?php if (!empty($row['image'])): ?>
@@ -1040,21 +1043,26 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                                     <?php endif; ?>
                                 </td>
                                 <td class="py-3">
-                                    <div class="text-dark fw-bold d-flex align-items-center gap-2" title="<?= htmlspecialchars($row['u_name']) ?>">
-                                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light border" style="width: 24px; height: 24px; min-width: 24px;">
+                                    <div class="text-dark fw-bold d-flex align-items-center gap-1 mb-1" title="<?= htmlspecialchars($row['u_name']) ?>">
+                                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light border" style="width: 20px; height: 20px; min-width: 20px;">
                                             <?php if (!empty($row['u_image']) && $row['u_image'] !== 'default_user.png'): ?>
                                                 <img src="assets/images/<?= htmlspecialchars($row['u_image']) ?>" alt="User" style="width: 100%; height: 100%; object-fit: cover;">
                                             <?php else: ?>
-                                                <i class="fas fa-user text-secondary" style="font-size: 0.7rem;"></i>
+                                                <i class="fas fa-user text-secondary" style="font-size: 0.6rem;"></i>
                                             <?php endif; ?>
                                         </div>
-                                        <?= htmlspecialchars($row['u_name']) ?>
+                                        <span style="font-size: 0.8rem;"><?= htmlspecialchars($row['u_name']) ?></span>
                                     </div>
+                                    <?php if (!empty($row['building'])): ?>
+                                    <div class="text-muted lh-sm" style="font-size: 0.75rem; padding-left: 2px;"><i class="fas fa-map-marker-alt text-secondary me-1" style="width: 12px; text-align: center;"></i><?= htmlspecialchars($row['building']) ?> <?= htmlspecialchars($row['floor']) ?></div>
+                                    <?php endif; ?>
+                                    <?php if (!empty($row['department'])): ?>
+                                    <div class="text-muted lh-sm mt-1" style="font-size: 0.7rem; padding-left: 2px;"><i class="fas fa-users text-info me-1" style="width: 12px; text-align: center;"></i><?= htmlspecialchars($row['department']) ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="pe-3 py-3" style="white-space: nowrap;">
-                                    <span class="badge bg-light text-muted fw-normal px-2 py-1" style="font-size: 0.75rem; border: 1px solid #f1f5f9;">
-                                        <?= date('d/m/Y H:i', strtotime($row['borrowed_at'])) ?>
-                                    </span>
+                                    <div class="text-muted" style="font-size: 0.75rem;"><?= date('d/m/Y', strtotime($row['borrowed_at'])) ?></div>
+                                    <div class="text-secondary mt-1" style="font-size: 0.7rem;"><i class="far fa-clock me-1"></i><?= date('H:i', strtotime($row['borrowed_at'])) ?></div>
                                 </td>
                              </tr>
                         <?php endforeach; ?>

@@ -91,7 +91,7 @@ $sql .= " LIMIT " . $start . " ," . $length;
 
 // Final Query
 $stmt = $pdo->prepare("SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price,
-                       b.id as borrow_id, b.asset_number as b_asset, b.borrowed_at, b.returned_at, b.building, b.floor, b.department,
+                       b.id as borrow_id, b.asset_number as b_asset, b.borrowed_at, b.returned_at, b.building, b.floor, b.department, b.reason,
                        CONCAT(u.firstname, ' ', u.lastname) as borrower_name " . $sql);
 
 if (!empty($requestData['search']['value'])) {
@@ -117,9 +117,12 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     
     // Asset/Serial Info
     $display_asset = ($row['status'] == 'borrowed' && $row['b_asset']) ? $row['b_asset'] : '-';
+    $reason_text = ($row['status'] == 'borrowed' && !empty($row['reason'])) ? htmlspecialchars($row['reason']) : '';
+    $reasonHtml = $reason_text ? '<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-comment-dots text-info me-1"></i>'.$reason_text.'</div>' : '';
+    
     $assetHtml = '
         <div class="mb-0" style="font-size: 0.8rem;">Asset: <span class="fw-bold">'.$display_asset.'</span></div>
-        <div class="text-muted" style="font-size: 0.75rem;">S/N: <code>'.$row['serial_code'].'</code></div>';
+        <div class="text-muted" style="font-size: 0.75rem;">S/N: <code>'.$row['serial_code'].'</code></div>' . $reasonHtml;
     
     // Status Badge
     $statusClass = $row['status'] == 'available' ? 'success' : ($row['status'] == 'borrowed' ? 'warning' : 'secondary');
@@ -129,9 +132,10 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     // Borrower Info
     $borrowerHtml = '-';
     if ($row['status'] == 'borrowed' && $row['borrower_name']) {
+        $dept_html = !empty($row['department']) ? '<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-users me-1 text-info"></i> '.htmlspecialchars($row['department']).'</div>' : '';
         $borrowerHtml = '
             <div class="fw-bold text-dark mb-0" style="font-size: 0.8rem; line-height: 1.2;"><i class="fas fa-user-circle me-1 text-muted"></i> '.$row['borrower_name'].'</div>
-            <div class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-location-dot me-1"></i> '.$row['building'].' '.$row['floor'].'</div>';
+            <div class="text-muted" style="font-size: 0.75rem;"><i class="fas fa-location-dot me-1"></i> '.htmlspecialchars($row['building']).' '.htmlspecialchars($row['floor']).'</div>' . $dept_html;
     }
     
     $nestedData[] = $productHtml;
@@ -142,7 +146,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     
     // Date
     if ($row['status'] == 'borrowed' && $row['borrowed_at']) {
-        $nestedData[] = '<span class="text-muted small">'.date('d/m/Y H:i', strtotime($row['borrowed_at'])).'</span>';
+        $nestedData[] = '<div class="text-muted small">'.date('d/m/Y', strtotime($row['borrowed_at'])).'<br><span class="text-secondary" style="font-size: 0.75rem;"><i class="far fa-clock me-1"></i>'.date('H:i', strtotime($row['borrowed_at'])).'</span></div>';
     } else {
         $nestedData[] = '<span class="text-muted small">-</span>';
     }

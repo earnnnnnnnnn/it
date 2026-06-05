@@ -40,41 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // If not locked out (no error set yet), proceed with login check
     if (empty($error)) {
-        // Verify reCAPTCHA
-        $recaptcha_secret = $_ENV['RECAPTCHA_SECRET_KEY'] ?? "6Ld8NvEsAAAAAI2aaMTjkEPQdO6DEXgwnANSrGOs";
-        $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
-        
-        if (empty($recaptcha_response)) {
-            $error = "กรุณายืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ (reCAPTCHA)";
-            if (isset($_POST['ajax'])) {
-                echo json_encode(['success' => false, 'error' => $error]);
-                exit;
-            }
-        } else {
-            $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
-            $verify_data = [
-                'secret' => $recaptcha_secret,
-                'response' => $recaptcha_response
-            ];
-            $options = [
-                'http' => [
-                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method'  => 'POST',
-                    'content' => http_build_query($verify_data)
-                ]
-            ];
-            $context  = stream_context_create($options);
-            $verify_result = @file_get_contents($verify_url, false, $context);
-            $captcha_success = json_decode($verify_result);
 
-            if (!$captcha_success || !$captcha_success->success) {
-                $error = "การยืนยัน reCAPTCHA ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง";
-                if (isset($_POST['ajax'])) {
-                    echo json_encode(['success' => false, 'error' => $error]);
-                    exit;
-                }
-            }
-        }
 
         if (empty($error)) {
             $identifier = $_POST['identifier'];
@@ -84,7 +50,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute([$identifier, $identifier]);
     $user = $stmt->fetch();
 
-    if ($user && (password_verify($password, $user['password']) || $password === $user['password'])) {
+    $is_valid = false;
+    $needs_rehash = false;
+
+    if (password_verify($password, $user['password'])) {
+        $is_valid = true;
+        if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+            $needs_rehash = true;
+        }
+    } elseif ($password === $user['password']) {
+        $is_valid = true;
+        $needs_rehash = true;
+    }
+
+    if ($is_valid) {
+        // Upgrade password to hash if it was plain text or needs rehash
+        if ($needs_rehash) {
+            $new_hash = password_hash($password, PASSWORD_DEFAULT);
+            $update_stmt = $pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+            $update_stmt->execute([$new_hash, $user['id']]);
+        }
+
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['firstname'] . ' ' . $user['lastname'];
         $_SESSION['user_username'] = $user['username'];
@@ -135,8 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </head>
 <body class="login-container">
     <div class="login-card">
@@ -169,9 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             
-            <div class="mb-4 d-flex justify-content-center">
-                <div class="g-recaptcha" data-sitekey="<?= $_ENV['RECAPTCHA_SITE_KEY'] ?? '6Ld8NvEsAAAAAGVFW4Gw-1wbTAL_bo8x0EnRJzxV' ?>"></div>
-            </div>
+
 
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-3">เข้าสู่ระบบ</button>
             <div class="text-center">

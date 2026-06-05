@@ -20,33 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
     
-    // Verify reCAPTCHA
-    $recaptcha_secret = $_ENV['RECAPTCHA_SECRET_KEY'] ?? "6Ld8NvEsAAAAAI2aaMTjkEPQdO6DEXgwnANSrGOs";
-    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
 
-    if (empty($recaptcha_response)) {
-        $error = "กรุณายืนยันว่าคุณไม่ใช่โปรแกรมอัตโนมัติ (reCAPTCHA)";
-    } else {
-        $verify_url = 'https://www.google.com/recaptcha/api/siteverify';
-        $verify_data = [
-            'secret' => $recaptcha_secret,
-            'response' => $recaptcha_response
-        ];
-        $options = [
-            'http' => [
-                'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                'method'  => 'POST',
-                'content' => http_build_query($verify_data)
-            ]
-        ];
-        $context  = stream_context_create($options);
-        $verify_result = @file_get_contents($verify_url, false, $context);
-        $captcha_success = json_decode($verify_result);
-
-        if (!$captcha_success || !$captcha_success->success) {
-            $error = "การยืนยัน reCAPTCHA ไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง";
-        }
-    }
 
     if (empty($error)) {
         if ($password !== $confirm_password) {
@@ -57,8 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         if ($stmt->fetch()) {
             $error = 'อีเมลหรือชื่อผู้ใช้นี้ถูกใช้งานไปแล้ว';
         } else {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $stmt = $pdo->prepare("INSERT INTO users (username, firstname, lastname, email, password, role) VALUES (?, ?, ?, ?, ?, 'USER')");
-            if ($stmt->execute([$username, $firstname, $lastname, $email, $password])) {
+            if ($stmt->execute([$username, $firstname, $lastname, $email, $hashed_password])) {
                 $success = 'สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ';
                 if (isset($_POST['ajax'])) {
                     echo json_encode(['success' => true, 'message' => $success]);
@@ -87,8 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 </head>
 <body class="login-container">
     <div class="login-card" style="max-width: 450px;">
@@ -154,9 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 </div>
             </div>
 
-            <div class="mb-4 d-flex justify-content-center">
-                <div class="g-recaptcha" data-sitekey="<?= $_ENV['RECAPTCHA_SITE_KEY'] ?? '6Ld8NvEsAAAAAGVFW4Gw-1wbTAL_bo8x0EnRJzxV' ?>"></div>
-            </div>
+
 
             <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mb-3">ลงชื่อเข้าใช้งาน</button>
             <div class="text-center">
