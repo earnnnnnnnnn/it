@@ -16,9 +16,8 @@ try {
         3 => "total",
         4 => "available",
         5 => "borrowed",
-        6 => "broken",
-        7 => "total_value",
-        8 => "available" // sort stock level by available count
+        6 => "total_value",
+        7 => "available" // sort stock level by available count
     ];
 
     $orderColumnIndex = isset($_POST['order'][0]['column']) ? intval($_POST['order'][0]['column']) : 0;
@@ -106,7 +105,6 @@ try {
             '<div class="text-center">' . number_format($row['total']) . '</div>',
             '<div class="text-center text-success fw-bold">' . number_format($row['available']) . '</div>',
             '<div class="text-center text-primary fw-bold">' . number_format($row['borrowed']) . '</div>',
-            '<div class="text-center text-danger fw-bold">' . number_format($row['broken']) . '</div>',
             '<div class="text-end fw-bold">฿' . number_format($row['total_value'], 2) . '</div>',
             $stockLevel
         ];

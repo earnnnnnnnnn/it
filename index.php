@@ -989,13 +989,13 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                                     <?php endif; ?>
                                 </td>
                                 <td class="py-3">
-                                    <div class="text-dark fw-bold d-flex align-items-center gap-2" title="<?= htmlspecialchars($row['building'] . ' ชั้น ' . $row['floor'] . ' แผนก ' . $row['department']) ?>">
+                                    <div class="text-dark fw-bold d-flex align-items-center gap-2" title="<?= htmlspecialchars($row['building'] . ' ' . $row['floor'] . ' แผนก ' . $row['department']) ?>">
                                         <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light border" style="width: 24px; height: 24px; min-width: 24px;">
                                             <i class="fas fa-map-marker-alt text-secondary" style="font-size: 0.7rem;"></i>
                                         </div>
                                         <div class="d-flex flex-column lh-sm" style="white-space: normal; min-width: 200px;">
                                             <span><?= htmlspecialchars($row['building']) ?></span>
-                                            <span class="text-muted fw-normal" style="font-size: 0.7rem;">ชั้น <?= htmlspecialchars($row['floor']) ?> แผนก <?= htmlspecialchars($row['department']) ?></span>
+                                            <span class="text-muted fw-normal" style="font-size: 0.7rem;"><?= htmlspecialchars($row['floor']) ?> แผนก <?= htmlspecialchars($row['department']) ?></span>
                                         </div>
                                     </div>
                                 </td>

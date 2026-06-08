@@ -94,7 +94,6 @@ require_once '../includes/header.php';
                             <th class="text-center">ทั้งหมด</th>
                             <th class="text-center">พร้อมใช้</th>
                             <th class="text-center">ถูกเบิก</th>
-                            <th class="text-center">ชำรุด/สูญหาย</th>
                             <th class="text-end">มูลค่ารวม</th>
                             <th>ระดับสต็อก</th>
                         </tr>
@@ -192,9 +191,9 @@ $(document).ready(function() {
         "order": [[ 0, "asc" ]],
         "language": thaiLang,
         "columnDefs": [
-            { "className": "text-end", "targets": [2, 7] },
-            { "className": "text-center", "targets": [3, 4, 5, 6] },
-            { "orderable": false, "targets": [8] }
+            { "className": "text-end", "targets": [2, 6] },
+            { "className": "text-center", "targets": [3, 4, 5] },
+            { "orderable": false, "targets": [7] }
         ],
         "buttons": [
             {
