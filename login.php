@@ -10,6 +10,9 @@ if (isset($_SESSION['user_id'])) {
 }
 
 $error = '';
+if (isset($_GET['error']) && $_GET['error'] === 'suspended') {
+    $error = "เซสชันหมดอายุเนื่องจากบัญชีถูกระงับการใช้งาน";
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Rate Limit Configuration
@@ -53,14 +56,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $is_valid = false;
     $needs_rehash = false;
 
-    if (password_verify($password, $user['password'])) {
-        $is_valid = true;
-        if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+    if ($user && ($user['status'] ?? 'active') === 'suspended') {
+        $error = "บัญชีของคุณถูกระงับการใช้งาน กรุณาติดต่อผู้ดูแลระบบ";
+        if (isset($_POST['ajax'])) {
+            echo json_encode(['success' => false, 'error' => $error]);
+            exit;
+        }
+    } elseif ($user) {
+        if (password_verify($password, $user['password'])) {
+            $is_valid = true;
+            if (password_needs_rehash($user['password'], PASSWORD_DEFAULT)) {
+                $needs_rehash = true;
+            }
+        } elseif ($password === $user['password']) {
+            $is_valid = true;
             $needs_rehash = true;
         }
-    } elseif ($password === $user['password']) {
-        $is_valid = true;
-        $needs_rehash = true;
     }
 
     if ($is_valid) {

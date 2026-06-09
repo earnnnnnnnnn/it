@@ -133,7 +133,6 @@ try {
         echo json_encode(['success' => true]);
     }
 
-    // ===== DELETE USER =====
     elseif ($action === 'delete') {
         if (empty($_POST['id'])) {
             echo json_encode(['success' => false, 'message' => 'ไม่พบ ID ผู้ใช้']);
@@ -168,6 +167,33 @@ try {
         $pdo->prepare("DELETE FROM stock_imports WHERE admin_id = ?")->execute([$_POST['id']]);
         $pdo->prepare("DELETE FROM users WHERE id = ?")->execute([$_POST['id']]);
         $pdo->commit();
+
+        echo json_encode(['success' => true]);
+    }
+
+    // ===== TOGGLE STATUS =====
+    elseif ($action === 'toggle_status') {
+        if (empty($_POST['id']) || empty($_POST['status'])) {
+            echo json_encode(['success' => false, 'message' => 'ข้อมูลไม่ครบถ้วน']);
+            exit;
+        }
+
+        // Prevent self-suspend
+        if ($_POST['id'] == $_SESSION['user_id'] && $_POST['status'] === 'suspended') {
+            echo json_encode(['success' => false, 'message' => 'ไม่สามารถระงับบัญชีของตัวเองได้']);
+            exit;
+        }
+
+        // Check if status column exists, if not, auto-create it
+        try {
+            $pdo->query("SELECT status FROM users LIMIT 1");
+        } catch (PDOException $e) {
+            // Column does not exist
+            $pdo->exec("ALTER TABLE users ADD COLUMN status ENUM('active', 'suspended') NOT NULL DEFAULT 'active' AFTER role");
+        }
+
+        $stmt = $pdo->prepare("UPDATE users SET status = ? WHERE id = ?");
+        $stmt->execute([$_POST['status'], $_POST['id']]);
 
         echo json_encode(['success' => true]);
     }

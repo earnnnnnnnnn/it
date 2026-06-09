@@ -352,6 +352,7 @@ require_once '../includes/header.php';
                                             <th>ผู้ใช้</th>
                                             <th>อีเมล</th>
                                             <th>สิทธิ์</th>
+                                            <th>สถานะ</th>
                                             <th class="text-end">จัดการ</th>
                                         </tr>
                                     </thead>
@@ -371,13 +372,29 @@ require_once '../includes/header.php';
                                             <td>
                                                 <span class="badge bg-info-subtle text-info">ผู้ใช้ทั่วไป</span>
                                             </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
-                                                    <i class="fas fa-edit"></i>
+                                            <td>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                    <span class="badge bg-danger">ถูกระงับ</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success">ใช้งานปกติ</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-end" style="white-space:nowrap;">
+                                                <button class="btn btn-link text-primary p-0 px-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
+                                                    <i class="fas fa-pen-to-square"></i>
                                                 </button>
                                                 <?php if ($u['id'] != $_SESSION['user_id']): ?>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
-                                                    <i class="fas fa-trash"></i>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                <button class="btn btn-link text-success p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'active', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ปลดระงับ">
+                                                    <i class="fas fa-unlock"></i>
+                                                </button>
+                                                <?php else: ?>
+                                                <button class="btn btn-link text-warning p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'suspended', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ระงับใช้งาน">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                <?php endif; ?>
+                                                <button class="btn btn-link text-danger p-0 px-1" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
+                                                    <i class="fas fa-trash-can"></i>
                                                 </button>
                                                 <?php endif; ?>
                                             </td>
@@ -397,6 +414,7 @@ require_once '../includes/header.php';
                                             <th>ผู้ใช้</th>
                                             <th>อีเมล</th>
                                             <th>สิทธิ์</th>
+                                            <th>สถานะ</th>
                                             <th class="text-end">จัดการ</th>
                                         </tr>
                                     </thead>
@@ -416,13 +434,29 @@ require_once '../includes/header.php';
                                             <td>
                                                 <span class="badge bg-danger-subtle text-danger">ผู้ดูแลระบบ</span>
                                             </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
-                                                    <i class="fas fa-edit"></i>
+                                            <td>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                    <span class="badge bg-danger">ถูกระงับ</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success">ใช้งานปกติ</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-end" style="white-space:nowrap;">
+                                                <button class="btn btn-link text-primary p-0 px-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
+                                                    <i class="fas fa-pen-to-square"></i>
                                                 </button>
                                                 <?php if ($u['id'] != $_SESSION['user_id']): ?>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
-                                                    <i class="fas fa-trash"></i>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                <button class="btn btn-link text-success p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'active', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ปลดระงับ">
+                                                    <i class="fas fa-unlock"></i>
+                                                </button>
+                                                <?php else: ?>
+                                                <button class="btn btn-link text-warning p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'suspended', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ระงับใช้งาน">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                <?php endif; ?>
+                                                <button class="btn btn-link text-danger p-0 px-1" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
+                                                    <i class="fas fa-trash-can"></i>
                                                 </button>
                                                 <?php endif; ?>
                                             </td>
@@ -442,6 +476,7 @@ require_once '../includes/header.php';
                                             <th>ผู้ใช้</th>
                                             <th>อีเมล</th>
                                             <th>สิทธิ์</th>
+                                            <th>สถานะ</th>
                                             <th class="text-end">จัดการ</th>
                                         </tr>
                                     </thead>
@@ -461,13 +496,29 @@ require_once '../includes/header.php';
                                             <td>
                                                 <span class="badge bg-warning-subtle text-warning"><i class="fas fa-crown me-1"></i>ผู้ดูแลระบบสูงสุด</span>
                                             </td>
-                                            <td class="text-end">
-                                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
-                                                    <i class="fas fa-edit"></i>
+                                            <td>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                    <span class="badge bg-danger">ถูกระงับ</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-success">ใช้งานปกติ</span>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="text-end" style="white-space:nowrap;">
+                                                <button class="btn btn-link text-primary p-0 px-1" onclick="editUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['username'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['firstname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['lastname'], ENT_QUOTES) ?>', '<?= htmlspecialchars($u['email'], ENT_QUOTES) ?>', '<?= $u['role'] ?>', '<?= $u['image'] ?>')" title="แก้ไข">
+                                                    <i class="fas fa-pen-to-square"></i>
                                                 </button>
                                                 <?php if ($u['id'] != $_SESSION['user_id']): ?>
-                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
-                                                    <i class="fas fa-trash"></i>
+                                                <?php if (($u['status'] ?? 'active') === 'suspended'): ?>
+                                                <button class="btn btn-link text-success p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'active', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ปลดระงับ">
+                                                    <i class="fas fa-unlock"></i>
+                                                </button>
+                                                <?php else: ?>
+                                                <button class="btn btn-link text-warning p-0 px-1" onclick="toggleUserStatus(<?= $u['id'] ?>, 'suspended', '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ระงับใช้งาน">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
+                                                <?php endif; ?>
+                                                <button class="btn btn-link text-danger p-0 px-1" onclick="deleteUser(<?= $u['id'] ?>, '<?= htmlspecialchars($u['firstname'] . ' ' . $u['lastname'], ENT_QUOTES) ?>')" title="ลบ">
+                                                    <i class="fas fa-trash-can"></i>
                                                 </button>
                                                 <?php endif; ?>
                                             </td>
@@ -1499,6 +1550,29 @@ require_once '../includes/header.php';
                 var formData = new FormData();
                 formData.append('action', 'delete');
                 formData.append('id', id);
+                fetchUserAction(formData);
+            }
+        });
+    }
+
+    function toggleUserStatus(id, newStatus, name) {
+        var actionText = newStatus === 'suspended' ? 'ระงับการใช้งาน' : 'ปลดระงับการใช้งาน';
+        var confirmColor = newStatus === 'suspended' ? '#ffc107' : '#198754';
+        
+        Swal.fire({
+            title: 'ยืนยันการเปลี่ยนสถานะ?',
+            html: 'ต้องการ' + actionText + 'ผู้ใช้ <strong>' + name + '</strong> ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: confirmColor,
+            confirmButtonText: 'ยืนยัน',
+            cancelButtonText: 'ยกเลิก'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                var formData = new FormData();
+                formData.append('action', 'toggle_status');
+                formData.append('id', id);
+                formData.append('status', newStatus);
                 fetchUserAction(formData);
             }
         });

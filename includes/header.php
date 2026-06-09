@@ -5,13 +5,38 @@ $current_page = basename($_SERVER['PHP_SELF']);
 
 // Refresh user session data to ensure the header always displays the latest information
 if (isset($_SESSION['user_id']) && isset($pdo)) {
-    $stmt_user_update = $pdo->prepare("SELECT firstname, lastname, role, image FROM users WHERE id = ?");
-    $stmt_user_update->execute([$_SESSION['user_id']]);
-    $latest_user = $stmt_user_update->fetch();
-    if ($latest_user) {
-        $_SESSION['user_name'] = $latest_user['firstname'] . ' ' . $latest_user['lastname'];
-        $_SESSION['user_role'] = $latest_user['role'];
-        $_SESSION['user_image'] = $latest_user['image'];
+    try {
+        $stmt_user_update = $pdo->prepare("SELECT firstname, lastname, role, image, status FROM users WHERE id = ?");
+        $stmt_user_update->execute([$_SESSION['user_id']]);
+        $latest_user = $stmt_user_update->fetch();
+        
+        if ($latest_user) {
+            if (($latest_user['status'] ?? 'active') === 'suspended') {
+                // Force logout if suspended
+                session_destroy();
+                header('Location: ' . $base_path . 'login.php?error=suspended');
+                exit;
+            }
+            
+            $_SESSION['user_name'] = $latest_user['firstname'] . ' ' . $latest_user['lastname'];
+            $_SESSION['user_role'] = $latest_user['role'];
+            $_SESSION['user_image'] = $latest_user['image'];
+        } else {
+            // User deleted
+            session_destroy();
+            header('Location: ' . $base_path . 'login.php');
+            exit;
+        }
+    } catch (PDOException $e) {
+        // Fallback if 'status' column doesn't exist yet (migration not run)
+        $stmt_user_update = $pdo->prepare("SELECT firstname, lastname, role, image FROM users WHERE id = ?");
+        $stmt_user_update->execute([$_SESSION['user_id']]);
+        $latest_user = $stmt_user_update->fetch();
+        if ($latest_user) {
+            $_SESSION['user_name'] = $latest_user['firstname'] . ' ' . $latest_user['lastname'];
+            $_SESSION['user_role'] = $latest_user['role'];
+            $_SESSION['user_image'] = $latest_user['image'];
+        }
     }
 }
 ?>

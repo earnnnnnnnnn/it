@@ -36,7 +36,7 @@ try {
             $username = strtolower(str_replace(' ', '', $firstname)) . rand(100, 999);
             $new_email = $username . '@it-system.com';
             
-            $stmt_create = $pdo->prepare("INSERT INTO users (username, firstname, lastname, email, password, role) VALUES (?, ?, ?, ?, ?, 'USER')");
+            $stmt_create = $pdo->prepare("INSERT INTO users (username, firstname, lastname, email, password, role, status) VALUES (?, ?, ?, ?, ?, 'USER', 'suspended')");
             $hashed_password = password_hash('123456', PASSWORD_DEFAULT);
             $stmt_create->execute([$username, $firstname, $lastname, $new_email, $hashed_password]);
             $borrower_id = $pdo->lastInsertId();
