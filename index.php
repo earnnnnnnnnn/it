@@ -937,7 +937,7 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
         <div class="chart-card">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h6 class="fw-bold mb-0 text-dark"><i class="fas fa-history text-primary me-2"></i>รายการเบิกล่าสุด</h6>
-                <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold shadow-sm" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#loginModal">ดูทั้งหมด <i class="fas fa-arrow-right ms-1"></i></a>
+                <a href="javascript:void(0)" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold shadow-sm" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#publicBorrowingsModal">ดูทั้งหมด <i class="fas fa-arrow-right ms-1"></i></a>
             </div>
             
             <div class="table-responsive flex-grow-1">
@@ -1109,5 +1109,115 @@ document.addEventListener("DOMContentLoaded", function () {
     .hover-bg-light:hover { background-color: #f8fafc; transition: 0.2s; }
     .transition-all { transition: all 0.2s ease-in-out; }
 </style>
+
+<!-- Public Borrowings Modal -->
+<div class="modal fade" id="publicBorrowingsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom bg-light">
+                <h5 class="modal-title fw-bold text-dark"><i class="fas fa-list text-primary me-2"></i>รายการเบิกทั้งหมด</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div class="table-responsive">
+                    <table class="table align-middle table-transparent mb-0" style="font-size: 0.85rem;" id="publicBorrowingsTable">
+                        <thead class="sticky-top bg-light shadow-sm" style="z-index: 1;">
+                            <tr>
+                                <th class="ps-3 text-muted fw-bold pb-2 pt-3" style="font-size: 0.75rem;">สินค้า</th>
+                                <th class="text-muted fw-bold pb-2 pt-3" style="font-size: 0.75rem;">SERIAL</th>
+                                <th class="text-muted fw-bold pb-2 pt-3" style="font-size: 0.75rem;">ราคาต่อหน่วย</th>
+                                <th class="text-muted fw-bold pb-2 pt-3" style="font-size: 0.75rem;">เลขครุภัณฑ์</th>
+                                <th class="text-muted fw-bold pb-2 pt-3 text-center" style="font-size: 0.75rem;">รูปถ่าย</th>
+                                <th class="text-muted fw-bold pb-2 pt-3" style="font-size: 0.75rem;">สถานที่ไป</th>
+                                <th class="text-muted fw-bold pb-2 pt-3 pe-3" style="font-size: 0.75rem;">วันที่เบิก</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicBorrowingsBody">
+                            <tr><td colspan="7" class="text-center text-muted py-4"><i class="fas fa-spinner fa-spin me-2"></i>กำลังโหลดข้อมูล...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const publicBorrowingsModal = document.getElementById('publicBorrowingsModal');
+    let loaded = false;
+
+    publicBorrowingsModal.addEventListener('show.bs.modal', function () {
+        if(loaded) return;
+        
+        fetch('pages/ajax_get_public_borrowings.php')
+            .then(response => response.json())
+            .then(result => {
+                const tbody = document.getElementById('publicBorrowingsBody');
+                tbody.innerHTML = '';
+                
+                if(result.success && result.data.length > 0) {
+                    result.data.forEach(row => {
+                        const dateStr = new Date(row.borrowed_at).toLocaleString('th-TH', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+                        
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-bottom hover-bg-light';
+                        
+                        const img = row.p_image ? row.p_image : 'default_product.png';
+                        const imageCell = row.image 
+                            ? `<a href="assets/images/${row.image}" target="_blank" class="d-inline-block rounded overflow-hidden border shadow-sm transition-all hover-shadow-sm" style="width: 45px; height: 35px;"><img src="assets/images/${row.image}" style="width: 100%; height: 100%; object-fit: cover;"></a>`
+                            : '<span class="text-muted small">-</span>';
+                        
+                        const asset = row.asset_number || '-';
+                        const serial = row.serial_code || '-';
+                        
+                        tr.innerHTML = `
+                            <td class="ps-3 py-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded-3 border overflow-hidden d-flex align-items-center justify-content-center bg-light" style="width: 42px; height: 42px; min-width: 42px;">
+                                        <img src="assets/images/${img}" alt="Product" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                    </div>
+                                    <div class="fw-bold text-dark text-truncate" style="max-width: 150px; font-size: 0.9rem;" title="${row.p_name}">${row.p_name}</div>
+                                </div>
+                            </td>
+                            <td class="py-3">
+                                <div class="fw-bold" style="color: #ec4899; font-size: 0.85rem; font-family: monospace;">${serial}</div>
+                            </td>
+                            <td class="py-3">
+                                <div class="fw-bold text-primary" style="font-size: 0.9rem;">฿${parseFloat(row.price).toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+                            </td>
+                            <td class="py-3">
+                                <div class="text-muted" style="font-size: 0.85rem;">${asset}</div>
+                            </td>
+                            <td class="py-3 text-center">${imageCell}</td>
+                            <td class="py-3">
+                                <div class="text-dark fw-bold d-flex align-items-center gap-2">
+                                    <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light border" style="width: 24px; height: 24px; min-width: 24px;">
+                                        <i class="fas fa-map-marker-alt text-secondary" style="font-size: 0.7rem;"></i>
+                                    </div>
+                                    <div class="d-flex flex-column lh-sm" style="white-space: normal; min-width: 200px;">
+                                        <span>${row.building || ''}</span>
+                                        <span class="text-muted fw-normal" style="font-size: 0.7rem;">${row.floor || ''} ${row.department ? 'แผนก ' + row.department : ''}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="pe-3 py-3">
+                                <span class="badge bg-light text-muted fw-normal px-2 py-1" style="font-size: 0.75rem; border: 1px solid #f1f5f9;">${dateStr}</span>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                    loaded = true;
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">ไม่มีรายการเบิก</td></tr>';
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('publicBorrowingsBody').innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4"><i class="fas fa-exclamation-triangle me-2"></i>เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+            });
+    });
+});
+</script>
 
 <?php require_once 'includes/footer.php'; ?>
