@@ -1,5 +1,11 @@
 <?php
 require_once '../includes/auth.php';
+
+if (!in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])) {
+    header("Location: ../dashboard.php");
+    exit();
+}
+
 require_once '../config/db.php';
 
 $page_title = 'ค้นหาครุภัณฑ์ (SSR)';

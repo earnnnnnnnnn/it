@@ -340,59 +340,7 @@ $current_date_th = date('d') . ' ' . $thai_months[intval(date('m'))] . ' ' . (da
 
 require_once 'includes/header.php';
 ?>
-<!-- Select2 for searchable dropdowns -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<style>
-    .select2-container--default .select2-selection--single {
-        background: transparent !important;
-        border: none !important;
-        height: 34px !important;
-        padding: 2px 0;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #495057;
-        font-size: 0.85rem;
-        padding-left: 4px;
-        line-height: 30px;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__arrow {
-        height: 32px;
-        right: 4px;
-    }
-    .select2-container--default .select2-selection--single .select2-selection__placeholder {
-        color: #6c757d;
-    }
-    .select2-dropdown {
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
-        overflow: hidden;
-        margin-top: 4px;
-    }
-    .select2-container--default .select2-search--dropdown .select2-search__field {
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        padding: 8px 12px;
-        font-size: 0.85rem;
-    }
-    .select2-container--default .select2-search--dropdown .select2-search__field:focus {
-        border-color: #4361ee;
-        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
-        outline: none;
-    }
-    .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
-        background-color: #4361ee !important;
-        border-radius: 6px;
-    }
-    .select2-results__option {
-        padding: 8px 12px !important;
-        font-size: 0.85rem;
-    }
-    .select2-container {
-        width: 100% !important;
-    }
-</style>
+
 <?php
 ?>
 
@@ -528,74 +476,6 @@ require_once 'includes/header.php';
 
 
 
-<!-- Compact Search & Filter Panel -->
-<div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: #ffffff;">
-    <div class="card-body p-3">
-        <form method="GET" id="filterForm" class="row g-2 align-items-center">
-            <input type="hidden" name="period" value="<?= htmlspecialchars($f_period) ?>">
-            <div class="col-md-2">
-                <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
-                    <i class="fas fa-building text-primary me-2" style="font-size: 0.85rem;"></i>
-                    <select name="building" id="filterBuilding" class="filter-select" data-placeholder="อาคาร...">
-                        <option value=""></option>
-                        <?php foreach ($all_buildings as $b): ?>
-                            <option value="<?= htmlspecialchars($b) ?>" <?= $f_building === $b ? 'selected' : '' ?>><?= htmlspecialchars($b) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
-                    <i class="fas fa-layer-group text-primary me-2" style="font-size: 0.85rem;"></i>
-                    <select name="floor" id="filterFloor" class="filter-select" data-placeholder="ชั้น...">
-                        <option value=""></option>
-                        <?php foreach ($all_floors as $f): ?>
-                            <option value="<?= htmlspecialchars($f) ?>" <?= $f_floor === $f ? 'selected' : '' ?>><?= htmlspecialchars($f) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
-                    <i class="fas fa-users text-primary me-2" style="font-size: 0.85rem;"></i>
-                    <select name="dept" id="filterDept" class="filter-select" data-placeholder="แผนก...">
-                        <option value=""></option>
-                        <?php foreach ($all_depts as $d): ?>
-                            <option value="<?= htmlspecialchars($d) ?>" <?= $f_dept === $d ? 'selected' : '' ?>><?= htmlspecialchars($d) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date) ?>" title="ตั้งแต่วันที่">
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date) ?>" title="ถึงวันที่">
-                </div>
-            </div>
-            <div class="col-md-2 d-flex gap-1 justify-content-end">
-                <button type="submit" class="btn btn-primary btn-sm rounded-3 px-3 fw-bold shadow-sm">กรอง</button>
-                <a href="dashboard.php" class="btn btn-outline-danger btn-sm rounded-3 px-2"><i class="fas fa-rotate-left"></i> ล้าง</a>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-$(document).ready(function() {
-    $('.filter-select').select2({
-        allowClear: true,
-        placeholder: function() { return $(this).data('placeholder'); },
-        language: {
-            noResults: function() { return 'ไม่พบข้อมูล'; },
-            searching: function() { return 'กำลังค้นหา...'; }
-        }
-    });
-});
-</script>
 
 <!-- 4 Stats Cards Row -->
 <div class="row g-3 mb-4">

@@ -104,11 +104,13 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                 </a>
             </li>
             <?php endif; ?>
+            <?php if (in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])): ?>
             <li class="menu-item">
                 <a href="<?= $base_path ?>pages/search.php" class="menu-link <?= $current_page == 'search.php' ? 'active' : '' ?>">
                     <i class="fas fa-search"></i> <span class="menu-text">ค้นหาครุภัณฑ์</span>
                 </a>
             </li>
+            <?php endif; ?>
             <?php if (in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])): ?>
             <li class="text-muted small px-3 mt-4 mb-2 fw-bold text-uppercase" style="font-size: 10px;">คลังสินค้า</li>
             <li class="menu-item">
