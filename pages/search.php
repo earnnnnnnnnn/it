@@ -21,8 +21,6 @@ require_once '../includes/header.php';
 
 <div class="row g-4">
     <div class="col-12">
-        <h4 class="fw-bold mb-3">ค้นหาและประวัติรายการทั้งหมด</h4>
-        
         <!-- Simple Search Bar -->
         <div class="card p-3 border shadow-sm mb-4">
             <div class="row g-3 mb-3">
