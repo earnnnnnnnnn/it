@@ -41,8 +41,8 @@ require_once '../includes/header.php';
                             <i class="fas fa-sort-amount-down"></i>
                         </span>
                         <select id="dateSort" class="form-select border-start-0 shadow-none text-secondary">
-                            <option value="desc">วันที่เบิก: ใหม่ไปเก่า</option>
-                            <option value="asc">วันที่เบิก: เก่าไปใหม่</option>
+                            <option value="desc">วันที่: ใหม่ไปเก่า</option>
+                            <option value="asc">วันที่: เก่าไปใหม่</option>
                         </select>
                     </div>
                 </div>
