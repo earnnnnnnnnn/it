@@ -168,6 +168,16 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                                 <i class="fas fa-file-import me-2" style="font-size: 0.9rem;"></i> <span class="menu-text">เหตุผลการนำเข้า</span>
                             </a>
                         </li>
+                        <li class="mb-1">
+                            <a href="<?= $base_path ?>pages/settings.php?tab=categories" class="menu-link py-2 <?= ($current_page == 'settings.php' && ($_GET['tab'] ?? '') == 'categories') ? 'text-primary fw-bold' : 'text-muted' ?>">
+                                <i class="fas fa-tags me-2" style="font-size: 0.9rem;"></i> <span class="menu-text">หมวดหมู่</span>
+                            </a>
+                        </li>
+                        <li class="mb-1">
+                            <a href="<?= $base_path ?>pages/settings.php?tab=units" class="menu-link py-2 <?= ($current_page == 'settings.php' && ($_GET['tab'] ?? '') == 'units') ? 'text-primary fw-bold' : 'text-muted' ?>">
+                                <i class="fas fa-balance-scale me-2" style="font-size: 0.9rem;"></i> <span class="menu-text">หน่วยนับ</span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </li>

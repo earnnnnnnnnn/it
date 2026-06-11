@@ -1037,6 +1037,9 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                                     <?php if (!empty($row['reason'])): ?>
                                     <div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-comment-dots text-info me-1"></i><?= htmlspecialchars($row['reason']) ?></div>
                                     <?php endif; ?>
+                                    <?php if (!empty($row['notes'])): ?>
+                                    <div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-sticky-note text-warning me-1"></i><?= nl2br(htmlspecialchars($row['notes'])) ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="py-3 text-center">
                                     <?php if (!empty($row['image'])): ?>
@@ -1072,7 +1075,7 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                              </tr>
                         <?php endforeach; ?>
                         <?php if(empty($recent_data)): ?>
-                            <tr><td colspan="6" class="text-center text-muted py-4">ไม่มีรายการเบิก</td></tr>
+                            <tr><td colspan="7" class="text-center text-muted py-4">ไม่มีรายการเบิก</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
