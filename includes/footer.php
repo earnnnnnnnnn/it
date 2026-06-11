@@ -18,13 +18,18 @@
             
             // Check if keyboard is in Thai (Common issue in TH)
             if (e.key.match(/[ก-ฮะ-์]/)) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'สแกนผิดพลาด',
-                    text: 'กรุณาเปลี่ยนภาษาคีย์บอร์ดเป็นภาษาอังกฤษก่อนสแกน',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
+                const path = window.location.pathname;
+                const isIndexPage = path.endsWith('index.php') || path.endsWith('/it/') || path.endsWith('/it');
+                
+                if (!isIndexPage) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'สแกนผิดพลาด',
+                        text: 'กรุณาเปลี่ยนภาษาคีย์บอร์ดเป็นภาษาอังกฤษก่อนสแกน',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
                 barcodeBuffer = "";
                 return;
             }
