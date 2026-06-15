@@ -85,11 +85,13 @@ try {
         // 2. Asset & Serial Display
         $asset_number = !empty($row['asset_number']) ? htmlspecialchars($row['asset_number']) : '-';
         $serial_code = !empty($row['serial_code']) ? htmlspecialchars($row['serial_code']) : '-';
-        $reason = !empty($row['reason']) ? '<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-comment-dots me-1 text-info"></i>' . htmlspecialchars($row['reason']) . '</div>' : '';
+        $reason = !empty($row['reason']) ? '<div class="text-muted mt-1" style="font-size: 0.8rem;"><i class="fas fa-comment-dots text-info me-1"></i>' . htmlspecialchars($row['reason']) . '</div>' : '';
+        $note = !empty($row['notes']) ? '<div class="text-muted mt-1" style="font-size: 0.8rem;"><i class="fas fa-sticky-note text-warning me-1"></i>' . nl2br(htmlspecialchars($row['notes'])) . '</div>' : '';
+        
         $asset_serial_display = '
-            <div class="fw-bold text-dark" style="font-size: 0.75rem; white-space: nowrap;">' . $asset_number . '</div>
-            <div style="font-size: 0.7rem; white-space: nowrap;"><span class="text-muted">S/N:</span> <span class="text-danger">' . $serial_code . '</span></div>
-            ' . $reason;
+            <div class="fw-bold text-dark" style="font-size: 0.85rem; white-space: nowrap;">' . $asset_number . '</div>
+            <div style="font-size: 0.75rem; white-space: nowrap;"><span class="text-muted">S/N:</span> <span class="text-danger">' . $serial_code . '</span></div>
+            ' . $reason . $note;
 
         // 3. Image Display
         if (!empty($row['image'])) {

@@ -91,7 +91,7 @@ $sql .= " LIMIT " . $start . " ," . $length;
 
 // Final Query
 $stmt = $pdo->prepare("SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price,
-                       b.id as borrow_id, b.asset_number as b_asset, b.borrowed_at, b.returned_at, b.building, b.floor, b.department, b.reason,
+                       b.id as borrow_id, b.asset_number as b_asset, b.borrowed_at, b.returned_at, b.building, b.floor, b.department, b.reason, b.notes,
                        CONCAT(u.firstname, ' ', u.lastname) as borrower_name " . $sql);
 
 if (!empty($requestData['search']['value'])) {
@@ -116,13 +116,16 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         </div>';
     
     // Asset/Serial Info
-    $display_asset = ($row['status'] == 'borrowed' && $row['b_asset']) ? $row['b_asset'] : '-';
+    $display_asset = ($row['status'] == 'borrowed' && !empty($row['b_asset'])) ? htmlspecialchars($row['b_asset']) : '-';
     $reason_text = ($row['status'] == 'borrowed' && !empty($row['reason'])) ? htmlspecialchars($row['reason']) : '';
+    $notes_text = ($row['status'] == 'borrowed' && !empty($row['notes'])) ? nl2br(htmlspecialchars($row['notes'])) : '';
+    
     $reasonHtml = $reason_text ? '<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-comment-dots text-info me-1"></i>'.$reason_text.'</div>' : '';
+    $notesHtml = $notes_text ? '<div class="text-muted mt-1" style="font-size: 0.75rem;"><i class="fas fa-sticky-note text-warning me-1"></i>'.$notes_text.'</div>' : '';
     
     $assetHtml = '
         <div class="mb-0" style="font-size: 0.8rem;">Asset: <span class="fw-bold">'.$display_asset.'</span></div>
-        <div class="text-muted" style="font-size: 0.75rem;">S/N: <code>'.$row['serial_code'].'</code></div>' . $reasonHtml;
+        <div class="text-muted" style="font-size: 0.75rem;">S/N: <code>'.htmlspecialchars($row['serial_code']).'</code></div>' . $reasonHtml . $notesHtml;
     
     // Status Badge
     $statusClass = $row['status'] == 'available' ? 'success' : ($row['status'] == 'borrowed' ? 'warning' : 'secondary');

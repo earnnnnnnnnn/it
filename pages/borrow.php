@@ -434,7 +434,7 @@ require_once '../includes/header.php';
                 
                 <!-- ถ่ายรูปสินค้าเบิก -->
                 <div class="mb-3">
-                    <label class="form-label small fw-bold text-dark">ถ่ายรูปสินค้าเบิก (สภาพสินค้าก่อนเบิก)</label>
+                    <label class="form-label small fw-bold text-dark">ถ่ายรูปอุปกรณ์ที่ชำรุด ขอเปลี่ยน</label>
                     <div class="upload-zone position-relative">
                         <input type="file" id="borrowImage" class="d-none" accept="image/*">
                         
