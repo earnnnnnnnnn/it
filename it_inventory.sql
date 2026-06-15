@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 05, 2026 at 06:19 AM
+-- Generation Time: Jun 15, 2026 at 08:15 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -56,7 +56,13 @@ INSERT INTO `borrowings` (`id`, `serial_id`, `borrower_id`, `asset_number`, `bui
 (75, 83, 22, '7440-001-0001-62-0015', 'ตึกเจ้าพระยาอภัยภูเบศร', 'ชั้น 1', '055 - OPD ชั้น 1', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', 'เคาร์เตอร์ห้องบัตร(ห้องโถงใหญ่)', '2026-06-04 02:35:23', NULL, 'borrows/borrow_1780540523_4825.jpeg'),
 (76, 99, 23, '7440-001-0001-66-0077', 'อาคารอาชีวเวชกรรม', 'ชั้น 2', '186 - เทคโนโลยีสารสนเทศ', 'กชกร เมืองโพธิ์', 'ติดตั้งคอมใหม่', '', '2026-06-05 01:37:06', NULL, NULL),
 (77, 100, 24, '7440-001-0001-58-0042', 'อาคารเฉลิมพระเกียรติฯ', 'ชั้น 5', '007 - พ.ร.ส.', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', '', '2026-06-05 02:13:42', NULL, 'borrows/borrow_1780625622_8395.jpeg'),
-(78, 97, 25, '7440-001-0001-64-0062', 'ตึกเจ้าพระยาอภัยภูเบศร', 'ชั้น 1', '188 - ศูนย์การเรียนรู้ด้านการแพทย์แผนไทย (ร้านยาไทยโพธิ์เงิน)', 'กชกร เมืองโพธิ์', 'ติดตั้งคอมใหม่', 'ห้องมงคล', '2026-06-05 03:39:30', NULL, NULL);
+(78, 97, 25, '7440-001-0001-64-0062', 'ตึกเจ้าพระยาอภัยภูเบศร', 'ชั้น 1', '188 - ศูนย์การเรียนรู้ด้านการแพทย์แผนไทย (ร้านยาไทยโพธิ์เงิน)', 'กชกร เมืองโพธิ์', 'ติดตั้งคอมใหม่', 'ห้องมงคล', '2026-06-05 03:39:30', NULL, NULL),
+(79, 114, 26, '7440-001-0001-60-0114', 'อาคารอุบัติเหตุและฉุกเฉิน', 'ชั้น 1', '044 - อุบัติเหตุฉุกเฉิน', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', 'คีย์บอดแช่น้ำ', '2026-06-11 06:25:56', NULL, 'borrows/borrow_1781159156_4138.jpeg'),
+(80, 122, 26, '7440-001-0001-60-0114', 'อาคารอุบัติเหตุและฉุกเฉิน', 'ชั้น 1', '044 - อุบัติเหตุฉุกเฉิน', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', 'คีย์บอดแช่น้ำ', '2026-06-11 06:25:56', NULL, 'borrows/borrow_1781159156_4138.jpeg'),
+(81, 116, 26, '7440-001-0001-66-0046', 'อาคารอุบัติเหตุและฉุกเฉิน', 'ชั้น 1', '044 - อุบัติเหตุฉุกเฉิน', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', 'คีย์บิดเมาส์แช่น้ำ', '2026-06-11 06:27:21', NULL, 'borrows/borrow_1781159241_9872.jpeg'),
+(82, 121, 26, '7440-001-0001-66-0046', 'อาคารอุบัติเหตุและฉุกเฉิน', 'ชั้น 1', '044 - อุบัติเหตุฉุกเฉิน', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', 'คีย์บิดเมาส์แช่น้ำ', '2026-06-11 06:27:21', NULL, 'borrows/borrow_1781159241_9872.jpeg'),
+(83, 119, 27, 'ไม่มีเลขครุภัณฑ์', 'อาคารเพชรรัตน์', 'ชั้น 1', '205 - OPD ศัลยกรรมทั่วไป', 'กชกร เมืองโพธิ์', 'ติดตั้งคอมใหม่', '', '2026-06-15 02:12:08', NULL, NULL),
+(84, 117, 28, '7440-001-0001-64-0069', 'อาคารอาชีวเวชกรรม', 'ชั้น 1', '015 - งานประกันสุขภาพ', 'กชกร เมืองโพธิ์', 'ของเก่าชำรุด', '', '2026-06-15 03:56:36', NULL, 'borrows/borrow_1781495796_5197.jpeg');
 
 -- --------------------------------------------------------
 
@@ -479,13 +485,15 @@ INSERT INTO `product_serials` (`id`, `product_id`, `serial_code`, `status`, `cre
 (111, 30, '2524APGC2CG9', 'available', '2026-06-05 02:49:26'),
 (112, 30, '2531AP70YML9', 'available', '2026-06-05 02:49:26'),
 (113, 30, '2531APG0YMN9', 'available', '2026-06-05 02:49:26'),
-(114, 30, '2531APQ0YMA9', 'available', '2026-06-05 02:49:26'),
+(114, 30, '2531APQ0YMA9', 'borrowed', '2026-06-05 02:49:26'),
 (115, 30, '2531AP50VKX9', 'available', '2026-06-05 02:49:26'),
-(116, 30, '2531APD0YM69', 'available', '2026-06-05 02:49:26'),
-(117, 30, '2524AP5C2CL9', 'available', '2026-06-05 02:49:26'),
+(116, 30, '2531APD0YM69', 'borrowed', '2026-06-05 02:49:26'),
+(117, 30, '2524AP5C2CL9', 'borrowed', '2026-06-05 02:49:26'),
 (118, 30, '2531APA0VLB9', 'available', '2026-06-05 02:49:26'),
-(119, 30, '2524APPC2CJ9', 'available', '2026-06-05 02:49:26'),
-(120, 30, '2531APC0YMD9', 'available', '2026-06-05 02:49:26');
+(119, 30, '2524APPC2CJ9', 'borrowed', '2026-06-05 02:49:26'),
+(120, 30, '2531APC0YMD9', 'available', '2026-06-05 02:49:26'),
+(121, 29, '2512MR304CC9', 'borrowed', '2026-06-11 06:18:48'),
+(122, 29, '2512MRU04CL9', 'borrowed', '2026-06-11 06:18:48');
 
 -- --------------------------------------------------------
 
@@ -555,7 +563,8 @@ INSERT INTO `stock_imports` (`id`, `admin_id`, `reason`, `created_at`) VALUES
 (23, 1, 'จัดซื้อใหม่', '2026-06-05 01:33:37'),
 (24, 1, 'จัดซื้อใหม่', '2026-06-05 01:57:38'),
 (25, 1, 'จัดซื้อใหม่', '2026-06-05 02:15:37'),
-(26, 1, 'จัดซื้อใหม่', '2026-06-05 02:49:26');
+(26, 1, 'จัดซื้อใหม่', '2026-06-05 02:49:26'),
+(27, 1, 'จัดซื้อใหม่', '2026-06-11 06:18:48');
 
 -- --------------------------------------------------------
 
@@ -585,7 +594,8 @@ INSERT INTO `stock_import_items` (`id`, `import_id`, `product_id`, `qty`) VALUES
 (42, 23, 31, 1),
 (43, 24, 30, 1),
 (44, 25, 30, 3),
-(45, 26, 30, 17);
+(45, 26, 30, 17),
+(46, 27, 29, 2);
 
 -- --------------------------------------------------------
 
@@ -646,7 +656,9 @@ INSERT INTO `stock_import_serials` (`id`, `import_item_id`, `serial_code`) VALUE
 (114, 45, '2524AP5C2CL9'),
 (115, 45, '2531APA0VLB9'),
 (116, 45, '2524APPC2CJ9'),
-(117, 45, '2531APC0YMD9');
+(117, 45, '2531APC0YMD9'),
+(118, 46, '2512MR304CC9'),
+(119, 46, '2512MRU04CL9');
 
 -- --------------------------------------------------------
 
@@ -688,6 +700,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` varchar(20) DEFAULT 'USER',
+  `status` enum('active','suspended') NOT NULL DEFAULT 'active',
   `image` varchar(255) DEFAULT 'default_user.png',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -696,17 +709,20 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `firstname`, `lastname`, `fullname`, `email`, `password`, `role`, `image`, `created_at`) VALUES
-(1, 'admin', 'กชกร', 'เมืองโพธิ์', 'กชกร เมืองโพธิ์', 'admin@gmail.com', '$2y$10$a3rbNVhCnHA0tLfWqKMlkucw1Z1j6cgwKyV/7FnbYQiQ3QT3mY87K', 'SUPERADMIN', 'users/user_1779340070_743.jpg', '2025-01-02 08:00:00'),
-(9, 'aomaom', 'เกวลิน', 'คอตแลนด์', '', 'baekaommie04@gmail.com', '$2y$10$U9WT.0RE6WDx1w6Hrq0kHeJT/j90kATI2ZcBGWOdwLHe6fIB3Sjg.', 'ADMIN', 'default_user.png', '2026-05-21 06:29:30'),
-(11, 'มาริสา695', 'มาริสา', 'ด่านดี', '', 'มาริสา695@it-system.com', '$2y$10$uyRuqa5d9..4c8XmXqcXoOSaAbXL94ro9qVWrFSeYnrUTeo.W6ufa', 'USER', 'default_user.png', '2026-05-22 08:58:08'),
-(12, 'นางสาวปิยะรัตน์420', 'นางสาวปิยะรัตน์', 'กิจจะ', '', 'นางสาวปิยะรัตน์420@it-system.com', '$2y$10$qvcU4P3Lk6HzuFfAe9E2oeQErscPf/sc/8LW/p3sFJkVP8Qab2S9e', 'USER', 'default_user.png', '2026-05-28 03:05:55'),
-(13, 'test', 'test', 'test', '', 'test@gmail.com', '$2y$10$vjBgAoKgvF9v9pZQ6r9HyukQzIYb.gwL3i9bZvM4d.O1wWD/Knvbq', 'USER', 'default_user.png', '2026-05-28 09:06:08'),
-(21, 'นายปฐมพงศ์407', 'นายปฐมพงศ์', 'สุภาพ', '', 'นายปฐมพงศ์407@it-system.com', '$2y$10$9h1/m2yUJtG1E2Tmb0Wv3ebvUL1W0UHNIkk96dYt0TtWkHbJorWy2', 'USER', 'default_user.png', '2026-06-02 07:42:08'),
-(22, 'นางวิภาวดี242', 'นางวิภาวดี', 'ดวงจันทร์', '', 'นางวิภาวดี242@it-system.com', '$2y$10$4VrqeIiwSYXX6RWL/rYuQ.XKdBOS/nQ3t2SponPizQWLb.i1qY3/m', 'USER', 'default_user.png', '2026-06-04 02:35:23'),
-(23, 'นายวัชพงษ์934', 'นายวัชพงษ์', 'อัณฑสูตร', '', 'นายวัชพงษ์934@it-system.com', '$2y$10$dIhQraHoJPWCSdNqgQpb4uR3.5JEL5P4Vm8MAON96BuDUsioEBSjO', 'USER', 'default_user.png', '2026-06-05 01:37:06'),
-(24, 'นายพงศธร614', 'นายพงศธร', 'ฝากกาย', '', 'นายพงศธร614@it-system.com', '$2y$10$iYJ.V/Sn121eLPvBTFUXBukFT0TkYgAzOlwKtocm.UYRaTVxW2hcy', 'USER', 'default_user.png', '2026-06-05 02:13:42'),
-(25, 'นางสาวณัชชา728', 'นางสาวณัชชา', 'เต็งเติมวงศ์', '', 'นางสาวณัชชา728@it-system.com', '$2y$10$/XjkqmBfYQvRI4PSgaBO0e11BnsWMMxEHfiIItgSmb0DZNC00BPSC', 'USER', 'default_user.png', '2026-06-05 03:39:30');
+INSERT INTO `users` (`id`, `username`, `firstname`, `lastname`, `fullname`, `email`, `password`, `role`, `status`, `image`, `created_at`) VALUES
+(1, 'admin', 'กชกร', 'เมืองโพธิ์', 'กชกร เมืองโพธิ์', 'admin@gmail.com', '$2y$10$a3rbNVhCnHA0tLfWqKMlkucw1Z1j6cgwKyV/7FnbYQiQ3QT3mY87K', 'SUPERADMIN', 'active', 'users/user_1779340070_743.jpg', '2025-01-02 08:00:00'),
+(9, 'aomaom', 'เกวลิน', 'คอตแลนด์', '', 'baekaommie04@gmail.com', '$2y$10$U9WT.0RE6WDx1w6Hrq0kHeJT/j90kATI2ZcBGWOdwLHe6fIB3Sjg.', 'ADMIN', 'active', 'default_user.png', '2026-05-21 06:29:30'),
+(11, 'มาริสา695', 'มาริสา', 'ด่านดี', '', 'มาริสา695@it-system.com', '$2y$10$uyRuqa5d9..4c8XmXqcXoOSaAbXL94ro9qVWrFSeYnrUTeo.W6ufa', 'USER', 'suspended', 'default_user.png', '2026-05-22 08:58:08'),
+(12, 'นางสาวปิยะรัตน์420', 'นางสาวปิยะรัตน์', 'กิจจะ', '', 'นางสาวปิยะรัตน์420@it-system.com', '$2y$10$qvcU4P3Lk6HzuFfAe9E2oeQErscPf/sc/8LW/p3sFJkVP8Qab2S9e', 'USER', 'suspended', 'default_user.png', '2026-05-28 03:05:55'),
+(13, 'test', 'test', 'test', '', 'test@gmail.com', '$2y$10$f/M5DtG1ifN7xakCPFuIXuk0SLDhfN.8yVuU2Q1TgTN45M7SDWySe', 'ADMIN', 'active', 'default_user.png', '2026-05-28 09:06:08'),
+(21, 'นายปฐมพงศ์407', 'นายปฐมพงศ์', 'สุภาพ', '', 'นายปฐมพงศ์407@it-system.com', '$2y$10$9h1/m2yUJtG1E2Tmb0Wv3ebvUL1W0UHNIkk96dYt0TtWkHbJorWy2', 'USER', 'suspended', 'default_user.png', '2026-06-02 07:42:08'),
+(22, 'นางวิภาวดี242', 'นางวิภาวดี', 'ดวงจันทร์', '', 'นางวิภาวดี242@it-system.com', '$2y$10$4VrqeIiwSYXX6RWL/rYuQ.XKdBOS/nQ3t2SponPizQWLb.i1qY3/m', 'USER', 'suspended', 'default_user.png', '2026-06-04 02:35:23'),
+(23, 'นายวัชพงษ์934', 'นายวัชพงษ์', 'อัณฑสูตร', '', 'นายวัชพงษ์934@it-system.com', '$2y$10$dIhQraHoJPWCSdNqgQpb4uR3.5JEL5P4Vm8MAON96BuDUsioEBSjO', 'USER', 'suspended', 'default_user.png', '2026-06-05 01:37:06'),
+(24, 'นายพงศธร614', 'นายพงศธร', 'ฝากกาย', '', 'นายพงศธร614@it-system.com', '$2y$10$iYJ.V/Sn121eLPvBTFUXBukFT0TkYgAzOlwKtocm.UYRaTVxW2hcy', 'USER', 'suspended', 'default_user.png', '2026-06-05 02:13:42'),
+(25, 'นางสาวณัชชา728', 'นางสาวณัชชา', 'เต็งเติมวงศ์', '', 'นางสาวณัชชา728@it-system.com', '$2y$10$/91CkT00LNnaDauGlAenC.L.g5izm9KCRWj1.3ck4JdbPtu48Wx3W', 'USER', 'suspended', 'default_user.png', '2026-06-05 03:39:30'),
+(26, 'ขษีร์สิริ269', 'ขษีร์สิริ', 'มงคล', '', 'ขษีร์สิริ269@it-system.com', '$2y$10$s1BPsZ5icKxHMgS2/AFaoOnG7SjafHVvjXoWuZHV61i0rZLpYEHX6', 'USER', 'suspended', 'default_user.png', '2026-06-11 06:25:56'),
+(27, 'ชิลาพัชน์761', 'ชิลาพัชน์', 'กุลพานัน', '', 'ชิลาพัชน์761@it-system.com', '$2y$10$qwGASUNftnF8QXA4OPGf8.y9t.ETXjZGmChmydSbQpMPlbOiaEzs2', 'USER', 'suspended', 'default_user.png', '2026-06-15 02:12:08'),
+(28, 'นางสาวอุษณี838', 'นางสาวอุษณี', 'วงศ์ไชยแย้ม', '', 'นางสาวอุษณี838@it-system.com', '$2y$10$Tq/1ibf5Zc1UUOZuW0M1cOCXL2qNzUpbnT2yxsr0vNBXOz59OBhqK', 'USER', 'suspended', 'default_user.png', '2026-06-15 03:56:36');
 
 --
 -- Indexes for dumped tables
@@ -814,7 +830,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `borrowings`
 --
 ALTER TABLE `borrowings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT for table `buildings`
@@ -850,7 +866,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `product_serials`
 --
 ALTER TABLE `product_serials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=121;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
 
 --
 -- AUTO_INCREMENT for table `reasons`
@@ -862,19 +878,19 @@ ALTER TABLE `reasons`
 -- AUTO_INCREMENT for table `stock_imports`
 --
 ALTER TABLE `stock_imports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `stock_import_items`
 --
 ALTER TABLE `stock_import_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=46;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT for table `stock_import_serials`
 --
 ALTER TABLE `stock_import_serials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=118;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
 
 --
 -- AUTO_INCREMENT for table `units`
@@ -886,7 +902,7 @@ ALTER TABLE `units`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- Constraints for dumped tables
