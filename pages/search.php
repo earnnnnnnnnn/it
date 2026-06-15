@@ -65,7 +65,7 @@ require_once '../includes/header.php';
         <div class="card border shadow-sm">
             <div class="card-body p-4">
                 <div class="table-responsive">
-                    <table id="ssrTable" class="table table-sm table-striped table-hover align-middle mb-0 text-nowrap" style="width:100%; font-size: 0.85rem;">
+                    <table id="ssrTable" class="table table-sm table-striped table-hover align-middle mb-0" style="width:100%; font-size: 0.85rem;">
                         <thead class="table-light">
                             <tr>
                                 <th>สินค้า</th>
