@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 15, 2026 at 08:15 AM
+-- Generation Time: Jun 17, 2026 at 07:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -82,8 +82,8 @@ CREATE TABLE `buildings` (
 --
 
 INSERT INTO `buildings` (`id`, `name`, `sort_order`, `created_at`) VALUES
-(1, 'ตึกเจ้าพระยาอภัยภูเบศร', 1, '2026-05-18 08:10:15'),
-(2, 'อาคาร 58 ปี', 2, '2026-05-18 08:10:15'),
+(1, 'ตึกเจ้าพระยาอภัยภูเบศร', 2, '2026-05-18 08:10:15'),
+(2, 'อาคาร 58 ปี', 1, '2026-05-18 08:10:15'),
 (3, 'อาคารคลังน้ำเกลือ', 3, '2026-05-18 08:10:15'),
 (4, 'อาคารคลังพัสดุ', 4, '2026-05-18 08:10:15'),
 (5, 'อาคารจิตตารมย์', 5, '2026-05-18 08:10:15'),
@@ -134,25 +134,6 @@ INSERT INTO `categories` (`id`, `name`, `sort_order`) VALUES
 (6, 'Network', 6);
 
 -- --------------------------------------------------------
-
---
--- Table structure for table `product_types`
---
-
-CREATE TABLE `product_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `name` varchar(100) NOT NULL,
-  `sort_order` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `product_types`
---
-
-INSERT INTO `product_types` (`id`, `name`, `sort_order`) VALUES
-(1, 'Keyboard', 1),
-(2, 'Mouse', 2),
-(3, 'จอคอมพิวเตอร์', 3);
 
 --
 -- Table structure for table `departments`
@@ -434,20 +415,24 @@ CREATE TABLE `products` (
   `model` varchar(100) DEFAULT NULL,
   `spec` text DEFAULT NULL,
   `price` decimal(10,2) DEFAULT 0.00,
+  `rental_price` decimal(10,2) DEFAULT 0.00,
+  `rental_duration` date DEFAULT NULL,
   `unit` varchar(50) DEFAULT 'เธเธดเนเธ',
   `min_alert` int(11) DEFAULT 5,
   `image` varchar(255) DEFAULT 'default_product.png',
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `remark` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`id`, `sku`, `name`, `category`, `brand`, `model`, `spec`, `price`, `unit`, `min_alert`, `image`, `created_at`) VALUES
-(29, '097855067128', 'Keyboard', 'IT', 'Logitech', 'k120 corded', '', 300.00, 'ชิ้น', 5, 'products/prod_1779418665.png', '2026-05-22 02:57:45'),
-(30, '097855180582', 'Mouse', 'IT', 'Logitech', 'M100r', '', 200.00, 'ชิ้น', 5, 'products/prod_1779418732.png', '2026-05-22 02:58:52'),
-(31, '013803233841', 'Pinter', 'IT', 'Canon', 'imageCLASS LBP6030', '', 4000.00, 'เครื่อง', 5, 'products/prod_1780560962.png', '2026-06-04 08:16:02');
+INSERT INTO `products` (`id`, `sku`, `name`, `category`, `brand`, `model`, `spec`, `price`, `rental_price`, `rental_duration`, `unit`, `min_alert`, `image`, `created_at`, `remark`) VALUES
+(29, '097855067128', 'Keyboard', 'IT', 'Logitech', 'k120 corded', '', 300.00, 0.00, NULL, 'ชิ้น', 5, 'products/prod_1779418665.png', '2026-05-22 02:57:45', NULL),
+(30, '097855180582', 'Mouse', 'IT', 'Logitech', 'M100r', '', 200.00, 0.00, NULL, 'ชิ้น', 5, 'products/prod_1779418732.png', '2026-05-22 02:58:52', NULL),
+(31, '013803233841', 'Pinter', 'IT', 'Canon', 'imageCLASS LBP6030', '', 4000.00, 0.00, NULL, 'เครื่อง', 5, 'products/prod_1780560962.png', '2026-06-04 08:16:02', NULL),
+(34, 'DQR3QST007', 'คอมพิวเตอร์ all in one', 'IT', 'Acer', 'Z2514G', 'Ram 8GB DDR4 Memory', 5000.00, 730.00, '2026-06-25', 'กล่อง', 5, 'products/prod_1781598103.png', '2027-06-30 08:21:43', 'คอมพิวเตอร์เช่า');
 
 -- --------------------------------------------------------
 
@@ -512,7 +497,31 @@ INSERT INTO `product_serials` (`id`, `product_id`, `serial_code`, `status`, `cre
 (119, 30, '2524APPC2CJ9', 'borrowed', '2026-06-05 02:49:26'),
 (120, 30, '2531APC0YMD9', 'available', '2026-06-05 02:49:26'),
 (121, 29, '2512MR304CC9', 'borrowed', '2026-06-11 06:18:48'),
-(122, 29, '2512MRU04CL9', 'borrowed', '2026-06-11 06:18:48');
+(122, 29, '2512MRU04CL9', 'borrowed', '2026-06-11 06:18:48'),
+(125, 34, 'DQR3QST00751301BFC3000', 'available', '2026-06-16 08:21:43'),
+(126, 34, 'DQR3QST00751301BE23000', 'available', '2026-06-17 04:36:30');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_types`
+--
+
+CREATE TABLE `product_types` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `sort_order` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `product_types`
+--
+
+INSERT INTO `product_types` (`id`, `name`, `sort_order`) VALUES
+(1, 'Keyboard', 1),
+(2, 'Mouse', 2),
+(3, 'จอคอมพิวเตอร์', 3),
+(4, 'Pinter', 6);
 
 -- --------------------------------------------------------
 
@@ -550,6 +559,7 @@ CREATE TABLE `stock_imports` (
   `id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL,
   `reason` text DEFAULT NULL,
+  `note` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -557,33 +567,37 @@ CREATE TABLE `stock_imports` (
 -- Dumping data for table `stock_imports`
 --
 
-INSERT INTO `stock_imports` (`id`, `admin_id`, `reason`, `created_at`) VALUES
-(1, 1, 'นำเข้าครุภัณฑ์ไอทีรอบแรก ประจำปี 2568', '2025-01-10 09:00:00'),
-(2, 1, 'เพิ่มอุปกรณ์รองรับพนักงานใหม่ Q1/2568', '2025-03-01 08:30:00'),
-(4, 1, 'จัดซื้อใหม่', '2026-05-15 08:12:56'),
-(5, 1, 'จัดซื้อใหม่', '2026-05-18 07:47:28'),
-(6, 1, 'จัดซื้อใหม่', '2026-05-21 03:12:59'),
-(7, 1, 'จัดซื้อใหม่', '2026-05-21 03:14:56'),
-(8, 1, 'จัดซื้อใหม่', '2026-05-21 03:15:15'),
-(9, 1, 'จัดซื้อใหม่', '2026-05-21 05:00:09'),
-(10, 9, 'จัดซื้อใหม่', '2026-05-21 06:58:00'),
-(11, 9, 'จัดซื้อใหม่', '2026-05-21 07:03:39'),
-(12, 9, 'จัดซื้อใหม่', '2026-05-21 07:10:57'),
-(13, 1, 'จัดซื้อใหม่', '2026-05-21 09:46:57'),
-(14, 1, 'จัดซื้อใหม่', '2026-05-22 01:57:29'),
-(15, 1, 'จัดซื้อใหม่', '2026-05-22 02:52:09'),
-(16, 1, 'จัดซื้อใหม่', '2026-05-22 02:57:45'),
-(17, 1, 'จัดซื้อใหม่', '2026-05-22 02:58:52'),
-(18, 1, 'จัดซื้อใหม่', '2026-05-25 03:30:42'),
-(19, 1, 'จัดซื้อใหม่', '2026-06-02 07:23:57'),
-(20, 1, 'จัดซื้อใหม่', '2026-06-02 07:24:27'),
-(21, 1, 'จัดซื้อใหม่', '2026-06-04 02:20:39'),
-(22, 1, 'จัดซื้อใหม่', '2026-06-04 08:30:46'),
-(23, 1, 'จัดซื้อใหม่', '2026-06-05 01:33:37'),
-(24, 1, 'จัดซื้อใหม่', '2026-06-05 01:57:38'),
-(25, 1, 'จัดซื้อใหม่', '2026-06-05 02:15:37'),
-(26, 1, 'จัดซื้อใหม่', '2026-06-05 02:49:26'),
-(27, 1, 'จัดซื้อใหม่', '2026-06-11 06:18:48');
+INSERT INTO `stock_imports` (`id`, `admin_id`, `reason`, `note`, `created_at`) VALUES
+(1, 1, 'นำเข้าครุภัณฑ์ไอทีรอบแรก ประจำปี 2568', NULL, '2025-01-10 09:00:00'),
+(2, 1, 'เพิ่มอุปกรณ์รองรับพนักงานใหม่ Q1/2568', NULL, '2025-03-01 08:30:00'),
+(4, 1, 'จัดซื้อใหม่', NULL, '2026-05-15 08:12:56'),
+(5, 1, 'จัดซื้อใหม่', NULL, '2026-05-18 07:47:28'),
+(6, 1, 'จัดซื้อใหม่', NULL, '2026-05-21 03:12:59'),
+(7, 1, 'จัดซื้อใหม่', NULL, '2026-05-21 03:14:56'),
+(8, 1, 'จัดซื้อใหม่', NULL, '2026-05-21 03:15:15'),
+(9, 1, 'จัดซื้อใหม่', NULL, '2026-05-21 05:00:09'),
+(10, 9, 'จัดซื้อใหม่', NULL, '2026-05-21 06:58:00'),
+(11, 9, 'จัดซื้อใหม่', NULL, '2026-05-21 07:03:39'),
+(12, 9, 'จัดซื้อใหม่', NULL, '2026-05-21 07:10:57'),
+(13, 1, 'จัดซื้อใหม่', NULL, '2026-05-21 09:46:57'),
+(14, 1, 'จัดซื้อใหม่', NULL, '2026-05-22 01:57:29'),
+(15, 1, 'จัดซื้อใหม่', NULL, '2026-05-22 02:52:09'),
+(16, 1, 'จัดซื้อใหม่', NULL, '2026-05-22 02:57:45'),
+(17, 1, 'จัดซื้อใหม่', NULL, '2026-05-22 02:58:52'),
+(18, 1, 'จัดซื้อใหม่', NULL, '2026-05-25 03:30:42'),
+(19, 1, 'จัดซื้อใหม่', NULL, '2026-06-02 07:23:57'),
+(20, 1, 'จัดซื้อใหม่', NULL, '2026-06-02 07:24:27'),
+(21, 1, 'จัดซื้อใหม่', NULL, '2026-06-04 02:20:39'),
+(22, 1, 'จัดซื้อใหม่', NULL, '2026-06-04 08:30:46'),
+(23, 1, 'จัดซื้อใหม่', NULL, '2026-06-05 01:33:37'),
+(24, 1, 'จัดซื้อใหม่', NULL, '2026-06-05 01:57:38'),
+(25, 1, 'จัดซื้อใหม่', NULL, '2026-06-05 02:15:37'),
+(26, 1, 'จัดซื้อใหม่', NULL, '2026-06-05 02:49:26'),
+(27, 1, 'จัดซื้อใหม่', NULL, '2026-06-11 06:18:48'),
+(28, 1, 'จัดซื้อใหม่', NULL, '2026-06-16 04:37:22'),
+(29, 1, 'นำเข้าพร้อมเปิดตัวสินค้าใหม่', NULL, '2026-06-16 07:49:17'),
+(30, 1, 'จัดซื้อใหม่', NULL, '2026-06-16 08:21:43'),
+(31, 1, 'จัดซื้อใหม่', '', '2026-06-17 04:36:30');
 
 -- --------------------------------------------------------
 
@@ -614,7 +628,9 @@ INSERT INTO `stock_import_items` (`id`, `import_id`, `product_id`, `qty`) VALUES
 (43, 24, 30, 1),
 (44, 25, 30, 3),
 (45, 26, 30, 17),
-(46, 27, 29, 2);
+(46, 27, 29, 2),
+(49, 30, 34, 1),
+(50, 31, 34, 1);
 
 -- --------------------------------------------------------
 
@@ -677,7 +693,9 @@ INSERT INTO `stock_import_serials` (`id`, `import_item_id`, `serial_code`) VALUE
 (116, 45, '2524APPC2CJ9'),
 (117, 45, '2531APC0YMD9'),
 (118, 46, '2512MR304CC9'),
-(119, 46, '2512MRU04CL9');
+(119, 46, '2512MRU04CL9'),
+(122, 49, 'DQR3QST00751301BFC3000'),
+(123, 50, 'DQR3QST00751301BE23000');
 
 -- --------------------------------------------------------
 
@@ -799,6 +817,13 @@ ALTER TABLE `product_serials`
   ADD KEY `product_id` (`product_id`);
 
 --
+-- Indexes for table `product_types`
+--
+ALTER TABLE `product_types`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
+
+--
 -- Indexes for table `reasons`
 --
 ALTER TABLE `reasons`
@@ -879,13 +904,19 @@ ALTER TABLE `floors`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
 -- AUTO_INCREMENT for table `product_serials`
 --
 ALTER TABLE `product_serials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=123;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+
+--
+-- AUTO_INCREMENT for table `product_types`
+--
+ALTER TABLE `product_types`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `reasons`
@@ -897,19 +928,19 @@ ALTER TABLE `reasons`
 -- AUTO_INCREMENT for table `stock_imports`
 --
 ALTER TABLE `stock_imports`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `stock_import_items`
 --
 ALTER TABLE `stock_import_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `stock_import_serials`
 --
 ALTER TABLE `stock_import_serials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=120;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=124;
 
 --
 -- AUTO_INCREMENT for table `units`
