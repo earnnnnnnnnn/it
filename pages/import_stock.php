@@ -563,7 +563,7 @@ require_once '../includes/header.php';
         }
 
         $(document).on('click', '.remove-serial', function() {
-            serials.delete($(this).data('code'));
+            serials.delete($(this).attr('data-code'));
             renderSerials();
         });
 
@@ -621,7 +621,7 @@ require_once '../includes/header.php';
         $('#modalSerialCount').text(modalSerials.size);
     }
     $(document).on('click', '.remove-modal-serial', function() {
-        modalSerials.delete($(this).data('code'));
+        modalSerials.delete($(this).attr('data-code'));
         updateModalSerialList();
     });
     $('#modalSerialInput').on('keydown', function(e) {

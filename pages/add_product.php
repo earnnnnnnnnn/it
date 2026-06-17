@@ -482,7 +482,7 @@ require_once '../includes/header.php';
         });
 
         $(document).on('click', '.remove-serial', function() {
-            const code = $(this).data('code');
+            const code = $(this).attr('data-code');
             serials.delete(code);
             updateSerialList();
         });

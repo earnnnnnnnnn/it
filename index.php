@@ -380,6 +380,11 @@ require_once 'includes/header.php';
 </style>
 
 <style>
+    /* Hide default date picker icon */
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        display: none;
+        -webkit-appearance: none;
+    }
     .stat-card-new {
         background: #ffffff;
         border: 1px solid #f1f5f9;
@@ -514,7 +519,7 @@ require_once 'includes/header.php';
     <div class="card-body p-3">
         <form method="GET" id="filterForm" class="row g-2 align-items-center">
             <input type="hidden" name="period" value="<?= htmlspecialchars($f_period) ?>">
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
                     <i class="fas fa-building text-primary me-2" style="font-size: 0.85rem;"></i>
                     <select name="building" id="filterBuilding" class="filter-select" data-placeholder="อาคาร...">
@@ -525,7 +530,7 @@ require_once 'includes/header.php';
                     </select>
                 </div>
             </div>
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
                     <i class="fas fa-layer-group text-primary me-2" style="font-size: 0.85rem;"></i>
                     <select name="floor" id="filterFloor" class="filter-select" data-placeholder="ชั้น...">
@@ -536,7 +541,7 @@ require_once 'includes/header.php';
                     </select>
                 </div>
             </div>
-            <div class="col-12 col-md-2">
+            <div class="col-12 col-md">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50" style="min-height: 38px;">
                     <i class="fas fa-users text-primary me-2" style="font-size: 0.85rem;"></i>
                     <select name="dept" id="filterDept" class="filter-select" data-placeholder="แผนก...">
@@ -547,21 +552,21 @@ require_once 'includes/header.php';
                     </select>
                 </div>
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-6 col-md-auto" style="width: 140px;">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
                     <i class="far fa-calendar-alt text-primary me-2" style="font-size: 0.85rem;"></i>
-                    <input type="<?= htmlspecialchars($start_date) ? 'date' : 'text' ?>" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date) ?>" placeholder="ตั้งแต่..." onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ตั้งแต่วันที่">
+                    <input type="<?= htmlspecialchars($start_date) ? 'date' : 'text' ?>" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date) ?>" placeholder="ตั้งแต่..." onfocus="(this.type='date'); setTimeout(() => { try { this.showPicker(); } catch(e) {} }, 50);" onblur="if(!this.value)this.type='text'" title="ตั้งแต่วันที่">
                 </div>
             </div>
-            <div class="col-6 col-md-2">
+            <div class="col-6 col-md-auto" style="width: 140px;">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
                     <i class="far fa-calendar-check text-primary me-2" style="font-size: 0.85rem;"></i>
-                    <input type="<?= htmlspecialchars($end_date) ? 'date' : 'text' ?>" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date) ?>" placeholder="ถึง..." onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ถึงวันที่">
+                    <input type="<?= htmlspecialchars($end_date) ? 'date' : 'text' ?>" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date) ?>" placeholder="ถึง..." onfocus="(this.type='date'); setTimeout(() => { try { this.showPicker(); } catch(e) {} }, 50);" onblur="if(!this.value)this.type='text'" title="ถึงวันที่">
                 </div>
             </div>
-            <div class="col-12 col-md-2 d-flex gap-2 mt-2 mt-md-0">
-                <button type="submit" class="btn btn-primary btn-sm rounded-3 fw-bold shadow-sm flex-grow-1"><i class="fas fa-filter"></i> กรอง</button>
-                <a href="index.php" class="btn btn-outline-danger btn-sm rounded-3 flex-grow-1 text-center"><i class="fas fa-rotate-left"></i> ล้าง</a>
+            <div class="col-12 col-md-auto d-flex align-items-center gap-2 mt-2 mt-md-0">
+                <button type="submit" class="btn btn-primary rounded-3 fw-bold shadow-sm d-flex align-items-center justify-content-center px-3" style="height: 38px;"><i class="fas fa-filter me-1"></i> กรอง</button>
+                <a href="index.php" class="btn rounded-3 text-center d-flex align-items-center justify-content-center px-3" style="height: 38px; background: #fff; color: #f97316; border: 1px solid #f97316;"><i class="fas fa-rotate-left me-1"></i> ล้าง</a>
             </div>
         </form>
     </div>

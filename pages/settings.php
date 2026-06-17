@@ -1131,7 +1131,7 @@ require_once '../includes/header.php';
     }
 
     $(document).on('click', '.remove-ep-serial', function() {
-        epSerials.delete($(this).data('code'));
+        epSerials.delete($(this).attr('data-code'));
         updateEpSerialList();
     });
 
