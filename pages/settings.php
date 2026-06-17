@@ -995,7 +995,7 @@ require_once '../includes/header.php';
             </div>
             <div class="modal-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 text-nowrap">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="table-light">
                             <tr>
                                 <th class="ps-4">Serial Number</th>
@@ -1502,8 +1502,15 @@ require_once '../includes/header.php';
                         let locParts = [];
                         if (s.building) locParts.push(s.building);
                         if (s.floor) locParts.push(s.floor);
-                        if (s.department) locParts.push(s.department);
-                        location = `<span class="badge bg-light text-dark border small"><i class="fas fa-building text-muted me-1"></i>${locParts.join(' / ')}</span>`;
+                        
+                        let locHtml = '';
+                        if (locParts.length > 0) {
+                            locHtml += `<div class="mb-1"><span class="badge bg-light text-dark border small"><i class="fas fa-building text-muted me-1"></i>${locParts.join(' / ')}</span></div>`;
+                        }
+                        if (s.department) {
+                            locHtml += `<div><span class="badge bg-light text-dark border small"><i class="fas fa-users text-muted me-1"></i>${s.department}</span></div>`;
+                        }
+                        location = locHtml || '-';
                     }
 
                     var details = '-';

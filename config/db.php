@@ -63,6 +63,14 @@ try {
     }
 } catch (\Exception $e) {}
 
+// Auto-migrate: add 'note' column to stock_imports if missing
+try {
+    $cols = $pdo->query("SHOW COLUMNS FROM stock_imports LIKE 'note'")->fetchAll();
+    if (count($cols) === 0) {
+        $pdo->exec("ALTER TABLE stock_imports ADD COLUMN note TEXT NULL AFTER reason");
+    }
+} catch (\Exception $e) {}
+
 // Auto-login from remember_me cookie if session user_id is not set
 if (!isset($_SESSION['user_id']) && isset($_COOKIE['remember_me'])) {
     $parts = explode(':', $_COOKIE['remember_me']);

@@ -19,8 +19,8 @@ try {
     $pdo->beginTransaction();
 
     // 1. Create import record
-    $stmt_import = $pdo->prepare("INSERT INTO stock_imports (admin_id, reason) VALUES (?, ?)");
-    $stmt_import->execute([$_SESSION['user_id'], $data['reason']]);
+    $stmt_import = $pdo->prepare("INSERT INTO stock_imports (admin_id, reason, note) VALUES (?, ?, ?)");
+    $stmt_import->execute([$_SESSION['user_id'], $data['reason'], $data['note'] ?? null]);
     $import_id = $pdo->lastInsertId();
 
     // 2. Create import item

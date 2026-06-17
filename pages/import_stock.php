@@ -115,6 +115,11 @@ require_once '../includes/header.php';
                 <input type="text" id="otherReason" class="form-control border-danger" placeholder="พิมพ์เหตุผลการนำเข้า...">
             </div>
 
+            <div class="mb-4">
+                <label class="form-label small fw-bold">หมายเหตุเพิ่มเติม (ถ้ามี)</label>
+                <textarea id="importNote" class="form-control border-secondary" rows="2" placeholder="ระบุหมายเหตุการนำเข้า..."></textarea>
+            </div>
+
             <button type="button" id="btnSubmitImport" class="btn btn-primary w-100 py-2 fw-bold" disabled>
                 <i class="fas fa-save me-2"></i> บันทึกการนำเข้า
             </button>
@@ -580,6 +585,7 @@ require_once '../includes/header.php';
             const data = {
                 product_id: selectedProductId,
                 reason: reason,
+                note: $('#importNote').val().trim(),
                 serials: Array.from(serials)
             };
 
