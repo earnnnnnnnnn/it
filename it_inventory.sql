@@ -136,6 +136,25 @@ INSERT INTO `categories` (`id`, `name`, `sort_order`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `product_types`
+--
+
+CREATE TABLE `product_types` (
+  `id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(100) NOT NULL,
+  `sort_order` int(11) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `product_types`
+--
+
+INSERT INTO `product_types` (`id`, `name`, `sort_order`) VALUES
+(1, 'Keyboard', 1),
+(2, 'Mouse', 2),
+(3, 'จอคอมพิวเตอร์', 3);
+
+--
 -- Table structure for table `departments`
 --
 

@@ -61,7 +61,7 @@ try {
     }
 
     // Fetch data
-    $sql = "SELECT b.*, ps.serial_code, p.name as p_name, p.brand, p.model, p.image as p_image, p.price, CONCAT(u.firstname, ' ', u.lastname) as u_name " . $baseSQL . " ORDER BY $orderBy $orderDir";
+    $sql = "SELECT b.*, ps.serial_code, p.name as p_name, p.brand, p.model, p.image as p_image, p.price, p.rental_price, CONCAT(u.firstname, ' ', u.lastname) as u_name " . $baseSQL . " ORDER BY $orderBy $orderDir";
     if ($length != -1) {
         $sql .= " LIMIT $length OFFSET $start";
     }
@@ -120,7 +120,10 @@ try {
             ' . $loc_html;
 
         // 5. Price Display
-        $price_display = '<span class="text-primary fw-bold">฿' . number_format($row['price'], 2) . '</span>';
+        $combined_price_display = '<div class="text-primary fw-bold mb-1">฿' . number_format($row['price'], 2) . '</div>';
+        if (($row['rental_price'] ?? 0) > 0) {
+            $combined_price_display .= '<div class="text-success fw-bold" style="font-size: 0.85rem;">เช่า: ฿' . number_format($row['rental_price'], 2) . '</div>';
+        }
 
         // 6. Date Display
         $date_display = '<span class="text-muted" style="font-size: 0.85rem;">' . date('d/m/Y H:i', strtotime($row['borrowed_at'])) . '</span>';
@@ -130,7 +133,7 @@ try {
             $asset_serial_display,
             $status_badge,
             $location_display,
-            $price_display,
+            $combined_price_display,
             $date_display
         ];
     }

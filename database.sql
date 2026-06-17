@@ -92,6 +92,13 @@ CREATE TABLE IF NOT EXISTS categories (
     sort_order INT DEFAULT 0
 );
 
+-- 8.5. Table: product_types
+CREATE TABLE IF NOT EXISTS product_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL,
+    sort_order INT DEFAULT 0
+);
+
 -- 9. Table: units
 CREATE TABLE IF NOT EXISTS units (
     id INT AUTO_INCREMENT PRIMARY KEY,

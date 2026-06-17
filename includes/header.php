@@ -174,6 +174,11 @@ if (isset($_SESSION['user_id']) && isset($pdo)) {
                             </a>
                         </li>
                         <li class="mb-1">
+                            <a href="<?= $base_path ?>pages/settings.php?tab=product_types" class="menu-link py-2 <?= ($current_page == 'settings.php' && ($_GET['tab'] ?? '') == 'product_types') ? 'text-primary fw-bold' : 'text-muted' ?>">
+                                <i class="fas fa-shapes me-2" style="font-size: 0.9rem;"></i> <span class="menu-text">ประเภทสินค้า</span>
+                            </a>
+                        </li>
+                        <li class="mb-1">
                             <a href="<?= $base_path ?>pages/settings.php?tab=units" class="menu-link py-2 <?= ($current_page == 'settings.php' && ($_GET['tab'] ?? '') == 'units') ? 'text-primary fw-bold' : 'text-muted' ?>">
                                 <i class="fas fa-balance-scale me-2" style="font-size: 0.9rem;"></i> <span class="menu-text">หน่วยนับ</span>
                             </a>

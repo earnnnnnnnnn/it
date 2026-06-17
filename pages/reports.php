@@ -60,7 +60,7 @@ require_once '../includes/header.php';
                             <th>เลขครุภัณฑ์ / SERIAL</th>
                             <th class="text-center">รูปถ่าย</th>
                             <th>ผู้ถือครอง / สถานที่</th>
-                            <th class="text-end">ราคา</th>
+                            <th class="text-end" style="white-space: nowrap;">ราคา<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                             <th>วันที่เบิก</th>
                         </tr>
                     </thead>
@@ -89,12 +89,12 @@ require_once '../includes/header.php';
                     <thead class="table-light">
                         <tr>
                             <th>สินค้า</th>
-                            <th>หมวดหมู่</th>
-                            <th class="text-end">ราคาต่อหน่วย</th>
+                            <th>หมวดหมู่<br><span class="text-muted small fw-normal">สัญญาเช่า</span></th>
+                            <th class="text-end" style="white-space: nowrap;">ราคา<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                             <th class="text-center">ทั้งหมด</th>
                             <th class="text-center">พร้อมใช้</th>
                             <th class="text-center">ถูกเบิก</th>
-                            <th class="text-end">มูลค่ารวม</th>
+                            <th class="text-end" style="white-space: nowrap;">มูลค่ารวม<br><span class="text-muted small fw-normal">ค่าเช่ารวม</span></th>
                             <th>ระดับสต็อก</th>
                         </tr>
                     </thead>
@@ -168,7 +168,7 @@ $(document).ready(function() {
         "order": [[ 5, "desc" ]],
         "language": thaiLang,
         "columnDefs": [
-            { "orderable": false, "targets": [2, 3] },
+            { "orderable": false, "targets": [0, 2, 3] },
             { "className": "text-end", "targets": [4] }
         ],
         "buttons": [
@@ -188,12 +188,12 @@ $(document).ready(function() {
             "url": "ajax_reports_inventory.php",
             "type": "POST"
         },
-        "order": [[ 0, "asc" ]],
+        "order": [[ 1, "asc" ]],
         "language": thaiLang,
         "columnDefs": [
             { "className": "text-end", "targets": [2, 6] },
             { "className": "text-center", "targets": [3, 4, 5] },
-            { "orderable": false, "targets": [7] }
+            { "orderable": false, "targets": [0, 7] }
         ],
         "buttons": [
             {

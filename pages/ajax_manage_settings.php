@@ -44,10 +44,13 @@ try {
                 }
             }
 
-            $stmt = $pdo->prepare("INSERT INTO products (name, sku, brand, model, category, spec, price, unit, min_alert, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO products (name, sku, brand, model, category, spec, price, rental_price, rental_duration, unit, min_alert, image, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $data['name'], $data['sku'], $data['brand'], $data['model'], $data['category'],
-                $data['spec'] ?? '', $data['price'] ?? 0, $data['unit'] ?? 'ชิ้น', $data['min_alert'], $image_name
+                $data['spec'] ?? '', $data['price'] ?? 0, 
+                $data['rental_price'] ?? 0, !empty($data['rental_duration']) ? $data['rental_duration'] : null,
+                $data['unit'] ?? 'ชิ้น', $data['min_alert'], $image_name,
+                $data['remark'] ?? null
             ]);
             $product_id = $pdo->lastInsertId();
 
@@ -58,8 +61,9 @@ try {
 
                 if (!empty($serials)) {
                     // Create Import Record
+                    $reason = !empty($data['import_reason']) ? $data['import_reason'] : 'นำเข้าพร้อมเปิดตัวสินค้าใหม่';
                     $stmt_import = $pdo->prepare("INSERT INTO stock_imports (admin_id, reason) VALUES (?, ?)");
-                    $stmt_import->execute([$_SESSION['user_id'], 'นำเข้าพร้อมเปิดตัวสินค้าใหม่']);
+                    $stmt_import->execute([$_SESSION['user_id'], $reason]);
                     $import_id = $pdo->lastInsertId();
 
                     $stmt_item = $pdo->prepare("INSERT INTO stock_import_items (import_id, product_id, qty) VALUES (?, ?, ?)");
@@ -87,10 +91,12 @@ try {
 
     // ===== EDIT PRODUCT =====
     elseif ($action === 'edit_product') {
-        $sql = "UPDATE products SET name = ?, sku = ?, brand = ?, model = ?, category = ?, spec = ?, price = ?, unit = ?, min_alert = ?";
+        $sql = "UPDATE products SET name = ?, sku = ?, brand = ?, model = ?, category = ?, spec = ?, price = ?, rental_price = ?, rental_duration = ?, unit = ?, min_alert = ?, remark = ?";
         $params = [
             $data['name'], $data['sku'], $data['brand'], $data['model'], $data['category'],
-            $data['spec'] ?? '', $data['price'] ?? 0, $data['unit'] ?? 'ชิ้น', $data['min_alert']
+            $data['spec'] ?? '', $data['price'] ?? 0, 
+            $data['rental_price'] ?? 0, !empty($data['rental_duration']) ? $data['rental_duration'] : null,
+            $data['unit'] ?? 'ชิ้น', $data['min_alert'], $data['remark'] ?? null
         ];
 
         // Handle Image Upload
@@ -378,6 +384,56 @@ try {
         echo json_encode(['success' => true]);
     }
 
+    // ===== ADD PRODUCT TYPE =====
+    elseif ($action === 'add_product_type') {
+        if (empty($data['name'])) {
+            echo json_encode(['success' => false, 'message' => 'กรุณากรอกชื่อประเภทสินค้า']);
+            exit;
+        }
+        $name = trim($data['name']);
+        $check = $pdo->prepare("SELECT id FROM product_types WHERE name = ?");
+        $check->execute([$name]);
+        if ($check->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'ประเภทสินค้านี้มีอยู่ในระบบแล้ว']);
+            exit;
+        }
+        
+        $max = $pdo->query("SELECT MAX(sort_order) FROM product_types")->fetchColumn() ?: 0;
+        $stmt = $pdo->prepare("INSERT INTO product_types (name, sort_order) VALUES (?, ?)");
+        $stmt->execute([$name, $max + 1]);
+        echo json_encode(['success' => true]);
+    }
+
+    // ===== EDIT PRODUCT TYPE =====
+    elseif ($action === 'edit_product_type') {
+        if (empty($data['name']) || empty($data['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ข้อมูลไม่ถูกต้อง']);
+            exit;
+        }
+        $name = trim($data['name']);
+        $check = $pdo->prepare("SELECT id FROM product_types WHERE name = ? AND id != ?");
+        $check->execute([$name, $data['id']]);
+        if ($check->fetch()) {
+            echo json_encode(['success' => false, 'message' => 'ชื่อประเภทสินค้านี้มีอยู่ในระบบแล้ว']);
+            exit;
+        }
+        
+        $stmt = $pdo->prepare("UPDATE product_types SET name = ? WHERE id = ?");
+        $stmt->execute([$name, $data['id']]);
+        echo json_encode(['success' => true]);
+    }
+
+    // ===== DELETE PRODUCT TYPE =====
+    elseif ($action === 'delete_product_type') {
+        if (empty($data['id'])) {
+            echo json_encode(['success' => false, 'message' => 'ข้อมูลไม่ถูกต้อง']);
+            exit;
+        }
+        $stmt = $pdo->prepare("DELETE FROM product_types WHERE id = ?");
+        $stmt->execute([$data['id']]);
+        echo json_encode(['success' => true]);
+    }
+
     // ===== ADD UNIT =====
     elseif ($action === 'add_unit') {
         if (empty($data['name'])) {
@@ -456,6 +512,28 @@ try {
         }
         
         echo json_encode(['success' => true, 'serials' => $serials]);
+    }
+
+    // ===== CHECK SKU =====
+    elseif ($action === 'check_sku') {
+        $sql = "SELECT id, name FROM products WHERE sku = ?";
+        $params = [$data['sku']];
+        if (!empty($data['exclude_id'])) {
+            $sql .= " AND id != ?";
+            $params[] = $data['exclude_id'];
+        }
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        $product = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'exists' => $product ? true : false, 'product' => $product]);
+    }
+
+    // ===== CHECK SERIAL =====
+    elseif ($action === 'check_serial') {
+        $stmt = $pdo->prepare("SELECT ps.id, p.name FROM product_serials ps JOIN products p ON ps.product_id = p.id WHERE ps.serial_code = ?");
+        $stmt->execute([$data['serial']]);
+        $serial = $stmt->fetch(PDO::FETCH_ASSOC);
+        echo json_encode(['success' => true, 'exists' => $serial ? true : false, 'serial' => $serial]);
     }
 
     else {

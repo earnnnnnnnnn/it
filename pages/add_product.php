@@ -2,6 +2,13 @@
 require_once '../includes/auth.php';
 require_once '../config/db.php';
 
+// Auto-migrate database columns if they don't exist
+try { $pdo->exec("ALTER TABLE products ADD COLUMN rental_price DECIMAL(10,2) DEFAULT '0.00' AFTER price"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE products ADD COLUMN rental_duration DATE NULL AFTER rental_price"); } catch (PDOException $e) {}
+try { $pdo->exec("UPDATE products SET rental_duration = NULL WHERE rental_duration = '0'"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE products MODIFY COLUMN rental_duration DATE NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE products ADD COLUMN remark TEXT NULL"); } catch (PDOException $e) {}
+
 if (!in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])) {
     header('Location: ../dashboard.php');
     exit;
@@ -11,6 +18,16 @@ $page_title = 'เพิ่มสินค้าใหม่';
 
 $categories = $pdo->query("SELECT * FROM categories ORDER BY sort_order ASC, id ASC")->fetchAll();
 $units = $pdo->query("SELECT * FROM units ORDER BY sort_order ASC, id ASC")->fetchAll();
+
+// Fetch distinct product types to populate the dropdown
+try {
+    $product_types_db = $pdo->query("SELECT * FROM product_types ORDER BY sort_order ASC, id ASC")->fetchAll();
+    $product_types = array_column($product_types_db, 'name');
+} catch (Exception $e) {
+    $existing_types = $pdo->query("SELECT DISTINCT name FROM products WHERE name IS NOT NULL AND name != '' ORDER BY name ASC")->fetchAll(PDO::FETCH_COLUMN);
+    $default_types = ['Keyboard', 'Mouse', 'จอคอมพิวเตอร์'];
+    $product_types = array_unique(array_merge($default_types, $existing_types));
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
@@ -28,11 +45,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         // 2. Insert Product
-        $stmt = $pdo->prepare("INSERT INTO products (sku, name, category, brand, model, spec, price, unit, min_alert, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $product_name = $_POST['name'];
+        if ($product_name === 'อื่นๆ' && !empty($_POST['other_name'])) {
+            $product_name = $_POST['other_name'];
+        }
+
+        $stmt = $pdo->prepare("INSERT INTO products (sku, name, category, brand, model, spec, price, rental_price, rental_duration, unit, min_alert, image, remark) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         $stmt->execute([
-            $_POST['sku'], $_POST['name'], $_POST['category'], $_POST['brand'], 
-            $_POST['model'], $_POST['spec'], $_POST['price'], $_POST['unit'], $_POST['min_alert'],
-            'products/' . $image_name
+            $_POST['sku'], $product_name, $_POST['category'], $_POST['brand'], 
+            $_POST['model'], $_POST['spec'], $_POST['price'], 
+            $_POST['rental_price'] ?? 0, !empty($_POST['rental_duration']) ? $_POST['rental_duration'] : null, 
+            $_POST['unit'], $_POST['min_alert'],
+            'products/' . $image_name,
+            $_POST['remark'] ?? null
         ]);
         $product_id = $pdo->lastInsertId();
 
@@ -102,8 +127,18 @@ require_once '../includes/header.php';
                         <input type="text" name="sku" class="form-control scan-focus border-orange bg-orange-light" placeholder="เช่น SKU-001" value="<?= isset($_GET['sku']) ? htmlspecialchars($_GET['sku']) : '' ?>" required>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label small fw-bold">ชื่อสินค้า <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="เช่น Logitech G Pro" required>
+                        <label class="form-label small fw-bold">ประเภทสินค้า <span class="text-danger">*</span></label>
+                        <select name="name" id="productName" class="form-select" onchange="toggleOtherProductName(this)" required>
+                            <option value="">-- เลือกประเภทสินค้า --</option>
+                            <?php foreach ($product_types as $type): ?>
+                                <option value="<?= htmlspecialchars($type) ?>"><?= htmlspecialchars($type) ?></option>
+                            <?php endforeach; ?>
+                            <option value="อื่นๆ">อื่นๆ (เพิ่มใหม่)</option>
+                        </select>
+                    </div>
+                    <div class="col-12" id="otherProductNameContainer" style="display: none;">
+                        <label class="form-label small fw-bold text-danger">ระบุประเภทสินค้าอื่นๆ <span class="text-danger">*</span></label>
+                        <input type="text" name="other_name" id="otherProductName" class="form-control border-danger" placeholder="พิมพ์ประเภทสินค้า...">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-bold">หมวดหมู่ <span class="text-danger">*</span></label>
@@ -127,8 +162,16 @@ require_once '../includes/header.php';
                         <textarea name="spec" class="form-control" rows="3"></textarea>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label small fw-bold">ราคาต่อหน่วย <span class="text-danger">*</span></label>
+                        <label class="form-label small fw-bold">ราคาต่อหน่วย (บาท) <span class="text-danger">*</span></label>
                         <input type="number" step="0.01" name="price" class="form-control" value="0.00" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">ราคาเช่า (บาท)</label>
+                        <input type="number" step="0.01" name="rental_price" class="form-control" value="0.00">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small fw-bold">วันสิ้นสุดการเช่า</label>
+                        <input type="date" name="rental_duration" class="form-control" value="">
                     </div>
                     <div class="col-md-4">
                         <label class="form-label small fw-bold">หน่วยนับ <span class="text-danger">*</span></label>
@@ -155,6 +198,10 @@ require_once '../includes/header.php';
                     <div class="col-12" id="otherReasonContainer" style="display: none;">
                         <label class="form-label small fw-bold text-danger">ระบุเหตุผลอื่นๆ <span class="text-danger">*</span></label>
                         <input type="text" name="other_reason" id="otherReason" class="form-control border-danger" placeholder="พิมพ์เหตุผลการนำเข้า...">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label small fw-bold">หมายเหตุ (ถ้ามี)</label>
+                        <textarea name="remark" class="form-control" rows="2" placeholder="ใส่หมายเหตุเพิ่มเติม..."></textarea>
                     </div>
                     <div class="col-md-8">
                         <label class="form-label small fw-bold">รูปสินค้า <span class="text-danger">*</span></label>
@@ -311,7 +358,7 @@ require_once '../includes/header.php';
         // If SKU is pre-filled from URL parameter, focus on the product name input
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('sku')) {
-            $('input[name="name"]').focus();
+            $('[name="name"]').focus();
         }
 
         function updateSerialList(latest = null) {
@@ -465,13 +512,13 @@ require_once '../includes/header.php';
                 return;
             }
 
-            if ($('input[name="sku"]').val() && $('input[name="name"]').val()) {
+            if ($('input[name="sku"]').val() && $('[name="name"]').val()) {
                 $('#productForm').submit();
             } else {
                 Swal.fire({
                     icon: 'warning',
                     title: 'ข้อมูลไม่ครบ',
-                    text: 'กรุณากรอกข้อมูลที่จำเป็น (SKU และ ชื่อสินค้า)'
+                    text: 'กรุณากรอกข้อมูลที่จำเป็น (SKU และ ประเภทสินค้า)'
                 });
             }
         });
@@ -497,6 +544,18 @@ require_once '../includes/header.php';
     function toggleOtherReason(el) {
         var container = document.getElementById('otherReasonContainer');
         var input = document.getElementById('otherReason');
+        if (el.value === 'อื่นๆ') {
+            container.style.display = 'block';
+            input.focus();
+        } else {
+            container.style.display = 'none';
+            input.value = '';
+        }
+    }
+
+    function toggleOtherProductName(el) {
+        var container = document.getElementById('otherProductNameContainer');
+        var input = document.getElementById('otherProductName');
         if (el.value === 'อื่นๆ') {
             container.style.display = 'block';
             input.focus();

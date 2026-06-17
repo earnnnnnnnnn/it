@@ -10,7 +10,7 @@ if (empty($q)) {
 }
 
 $search = "%$q%";
-$stmt = $pdo->prepare("SELECT ps.serial_code, p.name, p.brand, p.model, p.category, p.image, p.price, ps.status, b.asset_number, b.borrowed_at, b.returned_at,
+$stmt = $pdo->prepare("SELECT ps.serial_code, p.name, p.brand, p.model, p.category, p.image, p.price, p.rental_price, ps.status, b.asset_number, b.borrowed_at, b.returned_at,
                               b.building, b.floor, b.department, b.reason, TRIM(CONCAT(u.firstname, ' ', IFNULL(u.lastname, ''))) as borrower_name
                        FROM product_serials ps 
                        JOIN products p ON ps.product_id = p.id 

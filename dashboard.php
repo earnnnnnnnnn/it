@@ -258,7 +258,7 @@ $recent_where = $chart_where_sql;
 if (!in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])) {
     $recent_where .= ($recent_where ? " AND " : "WHERE ") . "b.borrower_id = " . (int)$_SESSION['user_id'];
 }
-$recent_sql = "SELECT b.*, ps.serial_code, p.name as p_name, p.brand, p.model, p.price, p.image as p_image, CONCAT(u.firstname, ' ', u.lastname) as u_name, u.image as u_image 
+$recent_sql = "SELECT b.*, ps.serial_code, p.name as p_name, p.brand, p.model, p.price, p.rental_price, p.image as p_image, CONCAT(u.firstname, ' ', u.lastname) as u_name, u.image as u_image 
                FROM borrowings b 
                JOIN product_serials ps ON b.serial_id = ps.id 
                JOIN products p ON ps.product_id = p.id 
@@ -572,12 +572,12 @@ require_once 'includes/header.php';
             </div>
             <div class="col-md-2">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date ?? '') ?>" title="ตั้งแต่วันที่">
+                    <input type="<?= !empty($start_date) ? 'date' : 'text' ?>" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date ?? '') ?>" placeholder="ตั้งแต่วันที่" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ตั้งแต่วันที่">
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date ?? '') ?>" title="ถึงวันที่">
+                    <input type="<?= !empty($end_date) ? 'date' : 'text' ?>" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date ?? '') ?>" placeholder="ถึงวันที่" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ถึงวันที่">
                 </div>
             </div>
             <div class="col-md-2 d-flex gap-1 justify-content-end">
@@ -1002,7 +1002,7 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                         <tr>
                             <th class="ps-3 text-muted fw-bold pb-2" style="font-size: 0.75rem;">สินค้า</th>
                             <th class="text-muted fw-bold pb-2" style="font-size: 0.75rem;">SERIAL</th>
-                            <th class="text-muted fw-bold pb-2" style="font-size: 0.75rem;">ราคาต่อหน่วย</th>
+                            <th class="text-muted fw-bold pb-2" style="font-size: 0.75rem; white-space: nowrap;">ราคา<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                             <th class="text-muted fw-bold pb-2" style="font-size: 0.75rem;">เลขครุภัณฑ์</th>
                             <th class="text-muted fw-bold pb-2 text-center" style="font-size: 0.75rem;">รูปถ่าย</th>
                             <th class="text-muted fw-bold pb-2" style="font-size: 0.75rem;">ผู้เบิก</th>
@@ -1029,6 +1029,11 @@ $max_floor_val = !empty($floors_summary) ? max($floors_summary) : 1;
                                     <div class="fw-bold text-primary" style="font-size: 0.9rem;">
                                         ฿<?= number_format($row['price'], 2) ?>
                                     </div>
+                                    <?php if (($row['rental_price'] ?? 0) > 0): ?>
+                                    <div class="fw-bold text-success" style="font-size: 0.8rem;">
+                                        เช่า: ฿<?= number_format($row['rental_price'] ?? 0, 2) ?>
+                                    </div>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="py-3">
                                     <div class="text-muted" style="font-size: 0.85rem;">

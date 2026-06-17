@@ -90,7 +90,7 @@ $length = isset($requestData['length']) ? intval($requestData['length']) : 10;
 $sql .= " LIMIT " . $start . " ," . $length;
 
 // Final Query
-$stmt = $pdo->prepare("SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price,
+$stmt = $pdo->prepare("SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price, p.rental_price,
                        b.id as borrow_id, b.asset_number as b_asset, b.borrowed_at, b.returned_at, b.building, b.floor, b.department, b.reason, b.notes,
                        CONCAT(u.firstname, ' ', u.lastname) as borrower_name " . $sql);
 
@@ -145,7 +145,10 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $nestedData[] = $assetHtml;
     $nestedData[] = $statusHtml;
     $nestedData[] = $borrowerHtml;
-    $nestedData[] = '<div class="text-end fw-bold text-primary">฿'.number_format($row['price'], 2).'</div>';
+    $nestedData[] = '<div class="text-end">
+                        <div class="fw-bold text-primary">฿'.number_format($row['price'], 2).'</div>' . 
+                        (($row['rental_price'] ?? 0) > 0 ? '<div class="fw-bold text-success" style="font-size: 0.8rem;">เช่า: ฿'.number_format($row['rental_price'], 2).'</div>' : '') . '
+                     </div>';
     
     // Date
     if ($row['status'] == 'borrowed' && $row['borrowed_at']) {

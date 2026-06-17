@@ -2,7 +2,7 @@
 require_once '../includes/auth.php';
 require_once '../config/db.php';
 
-if ($_SESSION['user_role'] != 'ADMIN') {
+if (!in_array($_SESSION['user_role'] ?? 'USER', ['ADMIN', 'SUPERADMIN'])) {
     header('Location: dashboard.php');
     exit;
 }

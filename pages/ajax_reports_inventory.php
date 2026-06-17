@@ -56,11 +56,12 @@ try {
     }
 
     // Fetch data
-    $sql = "SELECT p.name, p.sku, p.brand, p.category, p.image, p.price, COUNT(ps.id) as total, 
+    $sql = "SELECT p.name, p.sku, p.brand, p.category, p.image, p.price, p.rental_price, p.rental_duration, COUNT(ps.id) as total, 
                 SUM(CASE WHEN ps.status = 'available' THEN 1 ELSE 0 END) as available,
                 SUM(CASE WHEN ps.status = 'borrowed' THEN 1 ELSE 0 END) as borrowed,
                 SUM(CASE WHEN ps.status IN ('broken', 'lost', 'repairing') THEN 1 ELSE 0 END) as broken,
-                (p.price * COUNT(ps.id)) as total_value
+                (p.price * COUNT(ps.id)) as total_value,
+                (IFNULL(p.rental_price, 0) * COUNT(ps.id)) as total_rental_value
             FROM products p
             LEFT JOIN product_serials ps ON p.id = ps.product_id
             $whereClause
@@ -98,14 +99,47 @@ try {
             $stockLevel = '<span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25">ปกติ</span>';
         }
 
+        $combined_price = '<div class="text-end mb-1">฿' . number_format($row['price'], 2) . '</div>';
+        if (($row['rental_price'] ?? 0) > 0) {
+            $combined_price .= '<div class="text-end text-success" style="font-size: 0.85rem;">เช่า: ฿' . number_format($row['rental_price'], 2) . '</div>';
+        }
+
+        $categoryHtml = '<span class="badge bg-light text-dark fw-normal border mb-1">' . htmlspecialchars($row['category']) . '</span>';
+        if (!empty($row['rental_duration']) && $row['rental_duration'] !== '0000-00-00' && $row['rental_duration'] !== '0' && $row['rental_duration'] !== '1970-01-01') {
+            $end_date = new DateTime($row['rental_duration']);
+            $now = new DateTime();
+            $now->setTime(0, 0, 0);
+            $end_date->setTime(0, 0, 0);
+            
+            $categoryHtml .= '<div>';
+            if ($end_date < $now) {
+                $categoryHtml .= '<span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>หมดสัญญา</span>';
+            } else {
+                $diff = $now->diff($end_date);
+                $parts = [];
+                if ($diff->y > 0) $parts[] = $diff->y . ' ปี';
+                if ($diff->m > 0) $parts[] = $diff->m . ' เดือน';
+                if ($diff->d > 0) $parts[] = $diff->d . ' วัน';
+                
+                $text = empty($parts) ? 'ครบกำหนดวันนี้' : 'เหลือ ' . implode(' ', $parts);
+                $categoryHtml .= '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>' . $text . '</span>';
+            }
+            $categoryHtml .= '</div><div class="text-muted" style="font-size: 0.75rem; margin-top: 2px;">ถึง: ' . date('d/m/Y', strtotime($row['rental_duration'])) . '</div>';
+        }
+
+        $combined_total = '<div class="text-end fw-bold">฿' . number_format($row['total_value'], 2) . '</div>';
+        if (($row['total_rental_value'] ?? 0) > 0) {
+            $combined_total .= '<div class="text-end text-success" style="font-size: 0.85rem;">เช่า: ฿' . number_format($row['total_rental_value'], 2) . '</div>';
+        }
+
         $dataArray[] = [
             $productHtml,
-            '<span class="badge bg-light text-dark fw-normal border">' . htmlspecialchars($row['category']) . '</span>',
-            '<div class="text-end">฿' . number_format($row['price'], 2) . '</div>',
+            $categoryHtml,
+            $combined_price,
             '<div class="text-center">' . number_format($row['total']) . '</div>',
             '<div class="text-center text-success fw-bold">' . number_format($row['available']) . '</div>',
             '<div class="text-center text-primary fw-bold">' . number_format($row['borrowed']) . '</div>',
-            '<div class="text-end fw-bold">฿' . number_format($row['total_value'], 2) . '</div>',
+            $combined_total,
             $stockLevel
         ];
     }

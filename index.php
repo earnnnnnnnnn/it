@@ -549,12 +549,12 @@ require_once 'includes/header.php';
             </div>
             <div class="col-md-2">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date) ?>" title="ตั้งแต่วันที่">
+                    <input type="<?= htmlspecialchars($start_date) ? 'date' : 'text' ?>" name="start_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($start_date) ?>" placeholder="ตั้งแต่วันที่" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ตั้งแต่วันที่">
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="d-flex align-items-center border rounded-3 px-2 bg-light bg-opacity-50 overflow-hidden" style="min-height: 38px;">
-                    <input type="date" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date) ?>" title="ถึงวันที่">
+                    <input type="<?= htmlspecialchars($end_date) ? 'date' : 'text' ?>" name="end_date" class="form-control border-0 bg-transparent p-1 shadow-none" style="font-size: 0.75rem;" value="<?= htmlspecialchars($end_date) ?>" placeholder="ถึงวันที่" onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'" title="ถึงวันที่">
                 </div>
             </div>
             <div class="col-md-2 d-flex gap-1 justify-content-end">

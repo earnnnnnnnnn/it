@@ -27,7 +27,7 @@ $params = [];
 switch ($type) {
     case 'available':
         $page_title = "สินค้าพร้อมใช้งาน";
-        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price,
+        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price, p.rental_price,
                 (SELECT asset_number FROM borrowings WHERE serial_id = ps.id ORDER BY id DESC LIMIT 1) as asset_number
                 FROM product_serials ps 
                 JOIN products p ON ps.product_id = p.id 
@@ -36,7 +36,7 @@ switch ($type) {
         break;
     case 'borrowed':
         $page_title = "สินค้าที่ถูกเบิกใช้งาน";
-        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.image, p.price, p.category,
+        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.image, p.price, p.rental_price, p.category,
                        b.id as borrow_id, b.borrowed_at, b.asset_number, b.building, b.floor, b.department, b.reason, b.image as borrow_image,
                        b.borrower_id, CONCAT(u.firstname, ' ', u.lastname) as borrower, u.image as u_image
                 FROM product_serials ps 
@@ -57,7 +57,7 @@ switch ($type) {
         break;
     default:
         $page_title = "รายการสินค้าทั้งหมด (แยกตาม Serial Number)";
-        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price,
+        $sql = "SELECT ps.*, p.name, p.brand, p.model, p.category, p.image, p.price, p.rental_price,
                        (SELECT asset_number FROM borrowings WHERE serial_id = ps.id ORDER BY id DESC LIMIT 1) as asset_number,
                        (SELECT COALESCE(NULLIF(CONCAT(u.firstname, ' ', u.lastname), ' '), u.fullname) 
                         FROM stock_imports si 
@@ -146,6 +146,7 @@ require_once '../includes/header.php';
                         'category' => $row['category'] ?? '-',
                         'image' => $row['image'],
                         'price' => $row['price'],
+                        'rental_price' => $row['rental_price'] ?? 0,
                         'serials' => []
                     ];
                 }
@@ -159,7 +160,7 @@ require_once '../includes/header.php';
                         <th style="width: 40px;"></th>
                         <th>สินค้า</th>
                         <th>หมวดหมู่</th>
-                        <th class="text-end">ราคาต่อหน่วย</th>
+                        <th class="text-end" style="white-space: nowrap;">ราคาต่อหน่วย<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                         <th class="text-center">จำนวน S/N</th>
                         <th class="text-center">สถานะรวม</th>
                     </tr>
@@ -192,7 +193,12 @@ require_once '../includes/header.php';
                                 </div>
                             </td>
                             <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($product['category']) ?></span></td>
-                            <td class="text-end fw-bold text-secondary">฿<?= number_format($product['price'], 2) ?></td>
+                            <td class="text-end fw-bold text-secondary">
+                                <div>฿<?= number_format($product['price'], 2) ?></div>
+                                <?php if (($product['rental_price'] ?? 0) > 0): ?>
+                                <div class="text-success" style="font-size: 0.75rem;">เช่า: ฿<?= number_format($product['rental_price'], 2) ?></div>
+                                <?php endif; ?>
+                            </td>
                             <td class="text-center">
                                 <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2" style="font-size: 0.85rem;">
                                     <?= $serial_count ?> รายการ
@@ -286,7 +292,7 @@ require_once '../includes/header.php';
                         <th>ชื่อสินค้า</th>
                         <th>SKU</th>
                         <th>หมวดหมู่</th>
-                        <th class="text-end">ราคาต่อหน่วย</th>
+                        <th class="text-end" style="white-space: nowrap;">ราคาต่อหน่วย<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                         <th class="text-center">คงเหลือ (พร้อมใช้)</th>
                         <th class="text-center">เกณฑ์แจ้งเตือน</th>
                         <th class="text-center">สถานะ</th>
@@ -306,7 +312,12 @@ require_once '../includes/header.php';
                             </td>
                             <td><code><?= htmlspecialchars($row['sku']) ?></code></td>
                             <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($row['category'] ?? '-') ?></span></td>
-                            <td class="text-end fw-bold text-primary">฿<?= number_format($row['price'], 2) ?></td>
+                            <td class="text-end fw-bold text-primary">
+                                <div>฿<?= number_format($row['price'], 2) ?></div>
+                                <?php if (($row['rental_price'] ?? 0) > 0): ?>
+                                <div class="text-success" style="font-size: 0.75rem;">เช่า: ฿<?= number_format($row['rental_price'], 2) ?></div>
+                                <?php endif; ?>
+                            </td>
                             <td class="text-center">
                                 <div class="fw-bold fs-5 text-danger">
                                     <?= $row['current_stock'] ?>
@@ -340,10 +351,12 @@ require_once '../includes/header.php';
                         'borrow_image' => $row['borrow_image'],
                         'items' => [],
                         'total_value' => 0,
+                        'total_rental' => 0,
                     ];
                 }
                 $transactions[$key]['items'][] = $row;
                 $transactions[$key]['total_value'] += $row['price'];
+                $transactions[$key]['total_rental'] += ($row['rental_price'] ?? 0);
             }
         ?>
             <!-- Grouped Transaction View for Borrowed Items -->
@@ -356,6 +369,7 @@ require_once '../includes/header.php';
                         <th>เหตุผล</th>
                         <th class="text-center">จำนวนสินค้า</th>
                         <th class="text-end">มูลค่ารวม</th>
+                        <th class="text-end">ค่าเช่ารวม</th>
                         <th>วันที่เบิก</th>
                     </tr>
                 </thead>
@@ -400,6 +414,13 @@ require_once '../includes/header.php';
                                 </span>
                             </td>
                             <td class="text-end fw-bold text-primary">฿<?= number_format($txn['total_value'], 2) ?></td>
+                            <td class="text-end fw-bold text-success">
+                                <?php if (($txn['total_rental'] ?? 0) > 0): ?>
+                                ฿<?= number_format($txn['total_rental'], 2) ?>
+                                <?php else: ?>
+                                -
+                                <?php endif; ?>
+                            </td>
                             <td class="small text-muted"><?= formatThaiDate($txn['borrowed_at'], true) ?></td>
 
                         </tr>
@@ -410,7 +431,7 @@ require_once '../includes/header.php';
                                     <div class="d-flex align-items-center gap-2 mb-3">
                                         <i class="fas fa-boxes-stacked text-warning"></i>
                                         <span class="fw-bold small text-dark">รายการสินค้าที่เบิก — <?= htmlspecialchars($txn['borrower']) ?></span>
-                                        <span class="badge bg-warning bg-opacity-10 text-warning ms-auto"><?= $item_count ?> รายการ | ฿<?= number_format($txn['total_value'], 2) ?></span>
+                                        <span class="badge bg-warning bg-opacity-10 text-warning ms-auto"><?= $item_count ?> รายการ | มูลค่า ฿<?= number_format($txn['total_value'], 2) ?> <?= ($txn['total_rental'] ?? 0) > 0 ? '| ค่าเช่า ฿' . number_format($txn['total_rental'], 2) : '' ?></span>
                                     </div>
                                     
                                     <?php if ($txn['borrow_image']): ?>
@@ -427,6 +448,7 @@ require_once '../includes/header.php';
                                                 <th>Serial Code (S/N)</th>
                                                 <th>เลขครุภัณฑ์</th>
                                                 <th class="text-end">ราคา</th>
+                                                <th class="text-end">ค่าเช่า</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -444,7 +466,13 @@ require_once '../includes/header.php';
                                                     <td><code class="text-primary"><?= htmlspecialchars($item['serial_code']) ?></code></td>
                                                     <td><span class="text-muted"><?= htmlspecialchars($item['asset_number'] ?? '-') ?></span></td>
                                                     <td class="text-end fw-bold text-primary">฿<?= number_format($item['price'], 2) ?></td>
-
+                                                    <td class="text-end fw-bold text-success">
+                                                        <?php if (($item['rental_price'] ?? 0) > 0): ?>
+                                                        ฿<?= number_format($item['rental_price'], 2) ?>
+                                                        <?php else: ?>
+                                                        -
+                                                        <?php endif; ?>
+                                                    </td>
                                                 </tr>
                                             <?php endforeach; ?>
                                         </tbody>
@@ -456,33 +484,99 @@ require_once '../includes/header.php';
                 </tbody>
             </table>
         <?php else: ?>
-            <!-- Serial View (for available type) -->
-            <table class="table align-middle table-hover" style="font-size: 0.85rem;">
+            <!-- Grouped by Product Name View (for available type) -->
+            <?php 
+                $grouped_by_product = [];
+                foreach ($results as $row) {
+                    $pid = $row['product_id'];
+                    if (!isset($grouped_by_product[$pid])) {
+                        $grouped_by_product[$pid] = [
+                            'name' => $row['name'],
+                            'brand' => $row['brand'] ?? '',
+                            'model' => $row['model'] ?? '',
+                            'category' => $row['category'] ?? '-',
+                            'image' => $row['image'],
+                            'price' => $row['price'],
+                            'rental_price' => $row['rental_price'] ?? 0,
+                            'serials' => []
+                        ];
+                    }
+                    $grouped_by_product[$pid]['serials'][] = $row;
+                }
+            ?>
+            <table class="table align-middle" style="font-size: 0.85rem;">
                 <thead class="table-light">
                     <tr>
+                        <th style="width: 40px;"></th>
                         <th>สินค้า</th>
-                        <th>Serial Code</th>
-                        <th>ราคาต่อหน่วย</th>
-                        <th>เลขครุภัณฑ์</th>
-                        <th>วันที่นำเข้า</th>
+                        <th>หมวดหมู่</th>
+                        <th class="text-end" style="white-space: nowrap;">ราคาต่อหน่วย<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
+                        <th class="text-center">จำนวนที่พร้อมใช้งาน</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($results as $row): ?>
-                        <tr>
+                    <?php foreach ($grouped_by_product as $pid => $product): 
+                        $serial_count = count($product['serials']);
+                    ?>
+                        <!-- Product Row (Clickable) -->
+                        <tr class="product-row" 
+                            style="cursor: pointer; transition: background-color 0.15s;"
+                            onclick="toggleSerials('serials-avail-<?= $pid ?>', this)"
+                            onmouseover="this.style.backgroundColor='#f8f9ff'" 
+                            onmouseout="this.style.backgroundColor=''">
+                            <td class="text-center">
+                                <i class="fas fa-chevron-right text-muted small transition-transform" id="chevron-avail-<?= $pid ?>" style="transition: transform 0.25s ease;"></i>
+                            </td>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="../assets/images/<?= $row['image'] ?>" class="rounded border" width="45" height="45" style="object-fit: cover;" onerror="this.src='../assets/images/default_product.png'">
+                                    <img src="../assets/images/<?= htmlspecialchars($product['image']) ?>" class="rounded border" width="45" height="45" style="object-fit: cover;" onerror="this.src='../assets/images/default_product.png'">
                                     <div>
-                                        <div class="fw-bold"><?= htmlspecialchars($row['name']) ?></div>
-                                        <div class="text-muted small"><?= htmlspecialchars($row['brand'] ?? '') ?></div>
+                                        <div class="fw-bold"><?= htmlspecialchars($product['name']) ?></div>
+                                        <div class="text-muted small"><?= htmlspecialchars($product['brand']) ?> <?= htmlspecialchars($product['model']) ?></div>
                                     </div>
                                 </div>
                             </td>
-                            <td><code><?= htmlspecialchars($row['serial_code']) ?></code></td>
-                            <td class="text-primary fw-bold">฿<?= number_format($row['price'], 2) ?></td>
-                            <td><span class="text-muted small"><?= htmlspecialchars($row['asset_number'] ?? '-') ?></span></td>
-                            <td class="small text-muted"><?= formatThaiDate($row['created_at'], false) ?></td>
+                            <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($product['category']) ?></span></td>
+                            <td class="text-end fw-bold text-secondary">
+                                <div>฿<?= number_format($product['price'], 2) ?></div>
+                                <?php if (($product['rental_price'] ?? 0) > 0): ?>
+                                <div class="text-success" style="font-size: 0.75rem;">เช่า: ฿<?= number_format($product['rental_price'], 2) ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-3 py-2" style="font-size: 0.85rem;">
+                                    <?= $serial_count ?> พร้อมใช้
+                                </span>
+                            </td>
+                        </tr>
+                        <!-- Serial Details (Hidden by default) -->
+                        <tr id="serials-avail-<?= $pid ?>" style="display: none;">
+                            <td colspan="5" class="p-0 border-0">
+                                <div style="background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%); border-left: 3px solid var(--bs-primary); margin: 0 8px 8px 8px; border-radius: 0 8px 8px 8px; padding: 16px; animation: slideDown 0.25s ease;">
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <i class="fas fa-barcode text-primary"></i>
+                                        <span class="fw-bold small text-primary">Serial Numbers (S/N) พร้อมใช้งาน — <?= htmlspecialchars($product['name']) ?></span>
+                                    </div>
+                                    <table class="table table-sm align-middle mb-0 bg-white rounded shadow-sm" style="font-size: 0.82rem;">
+                                        <thead>
+                                            <tr class="text-muted" style="font-size: 0.75rem;">
+                                                <th class="ps-3">Serial Code (S/N)</th>
+                                                <th>เลขครุภัณฑ์</th>
+                                                <th>วันที่นำเข้า</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php foreach ($product['serials'] as $row): ?>
+                                                <tr>
+                                                    <td class="ps-3"><code class="text-primary"><?= htmlspecialchars($row['serial_code']) ?></code></td>
+                                                    <td><span class="text-muted"><?= htmlspecialchars($row['asset_number'] ?? '-') ?></span></td>
+                                                    <td class="small text-muted"><?= formatThaiDate($row['created_at'], false) ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

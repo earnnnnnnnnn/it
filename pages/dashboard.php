@@ -333,7 +333,7 @@ require_once '../includes/header.php';
                         <tr>
                             <th class="border-0">สินค้า</th>
                             <th class="border-0">Serial</th>
-                            <th class="border-0">ราคาต่อหน่วย</th>
+                            <th class="border-0" style="white-space: nowrap;">ราคา<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                             <th class="border-0">เลขครุภัณฑ์</th>
                             <th class="border-0">ผู้เบิก</th>
                             <th class="border-0">วันที่เบิก</th>
@@ -341,7 +341,7 @@ require_once '../includes/header.php';
                     </thead>
                     <tbody>
                         <?php
-                        $sql_recent = "SELECT b.*, ps.serial_code, p.name as p_name, p.price, CONCAT(u.firstname, ' ', u.lastname) as u_name 
+                        $sql_recent = "SELECT b.*, ps.serial_code, p.name as p_name, p.price, p.rental_price, CONCAT(u.firstname, ' ', u.lastname) as u_name 
                                      FROM borrowings b 
                                      JOIN product_serials ps ON b.serial_id = ps.id 
                                      JOIN products p ON ps.product_id = p.id 
@@ -359,7 +359,10 @@ require_once '../includes/header.php';
                             echo "<tr>
                                     <td><div class='fw-bold text-dark'>{$row['p_name']}</div></td>
                                     <td><code>{$row['serial_code']}</code></td>
-                                    <td class='text-primary fw-bold'>฿" . number_format($row['price'], 2) . "</td>
+                                    <td>
+                                        <div class='text-primary fw-bold mb-1'>฿" . number_format($row['price'], 2) . "</div>\" . 
+                                        (($row['rental_price'] ?? 0) > 0 ? \"<div class='text-success fw-bold' style='font-size: 0.85rem;'>เช่า: ฿\" . number_format($row['rental_price'], 2) . \"</div>\" : \"\") . \"
+                                    </td>
                                     <td><span class='text-muted small'>{$row['asset_number']}</span></td>
                                     <td><i class='fas fa-user-circle text-muted me-1'></i> {$row['u_name']}</td>
                                     <td><span class='badge bg-light text-dark fw-normal'>" . date('d/m/Y H:i', strtotime($row['borrowed_at'])) . "</span></td>

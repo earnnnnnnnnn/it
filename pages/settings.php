@@ -2,6 +2,11 @@
 require_once '../includes/auth.php';
 require_once '../config/db.php';
 
+try {
+    $pdo->exec("ALTER TABLE products MODIFY COLUMN rental_duration DATE NULL");
+} catch (PDOException $e) { }
+
+
 if (($_SESSION['user_role'] ?? 'USER') !== 'SUPERADMIN') {
     header('Location: ../dashboard.php');
     exit;
@@ -26,74 +31,75 @@ $departments = $pdo->query("SELECT * FROM departments ORDER BY sort_order ASC, i
 $categories = $pdo->query("SELECT * FROM categories ORDER BY sort_order ASC, id ASC")->fetchAll();
 $units = $pdo->query("SELECT * FROM units ORDER BY sort_order ASC, id ASC")->fetchAll();
 
-$allowed_tabs = ['buildings', 'floors', 'departments', 'products', 'users', 'borrow', 'import', 'categories', 'units'];
+try {
+    $product_types_db = $pdo->query("SELECT * FROM product_types ORDER BY sort_order ASC, id ASC")->fetchAll();
+    $product_types = array_column($product_types_db, 'name');
+} catch (Exception $e) {
+    $existing_types = $pdo->query("SELECT DISTINCT name FROM products WHERE name IS NOT NULL AND name != '' ORDER BY name ASC")->fetchAll(PDO::FETCH_COLUMN);
+    $default_types = ['Keyboard', 'Mouse', 'จอคอมพิวเตอร์'];
+    $product_types = array_unique(array_merge($default_types, $existing_types));
+    $product_types_db = [];
+}
+
+$allowed_tabs = ['buildings', 'floors', 'departments', 'product_types', 'products', 'users', 'borrow', 'import', 'categories', 'units'];
 $active_tab = isset($_GET['tab']) && in_array($_GET['tab'], $allowed_tabs, true) ? $_GET['tab'] : 'buildings';
 
 require_once '../includes/header.php';
 ?>
+<style>
+    .reason-item {
+        flex-wrap: nowrap !important;
+    }
+    .reason-item > div:first-child {
+        flex: 1;
+        min-width: 0;
+        padding-right: 10px;
+    }
+    .reason-item > div:first-child > span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+    .reason-item > div:last-child {
+        flex-shrink: 0;
+        white-space: nowrap;
+        display: flex;
+        gap: 0.25rem;
+    }
+    .reason-item > div:last-child > button {
+        margin: 0 !important;
+    }
+</style>
 
 <!-- Mobile Sub-navigation for settings tabs (Visible only on mobile/tablets) -->
 <div class="d-lg-none mb-4" style="overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;">
     <div class="d-inline-flex gap-2 p-1 bg-white border rounded-pill shadow-sm">
-        <a href="?tab=buildings" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'buildings' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-building me-1"></i> อาคาร
-        </a>
-        <a href="?tab=floors" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'floors' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-layer-group me-1"></i> ชั้น
-        </a>
-        <a href="?tab=departments" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'departments' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-network-wired me-1"></i> แผนก
-        </a>
-        <a href="?tab=products" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'products' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-boxes me-1"></i> สินค้า
-        </a>
-        <a href="?tab=users" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'users' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-users me-1"></i> ผู้ใช้งาน
-        </a>
-        <a href="?tab=borrow" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'borrow' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-hand-holding-heart me-1"></i> เหตุผลการเบิก
-        </a>
-        <a href="?tab=import" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'import' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-file-import me-1"></i> เหตุผลการนำเข้า
-        </a>
-        <a href="?tab=categories" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'categories' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-tags me-1"></i> หมวดหมู่
-        </a>
-        <a href="?tab=units" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'units' ? 'btn-primary' : 'btn-light text-muted' ?>">
-            <i class="fas fa-balance-scale me-1"></i> หน่วยนับ
-        </a>
+        <a href="?tab=buildings" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'buildings' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">อาคาร</a>
+        <a href="?tab=floors" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'floors' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ชั้น</a>
+        <a href="?tab=departments" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'departments' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">แผนก</a>
+        <a href="?tab=products" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'products' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">สินค้า</a>
+        <a href="?tab=users" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'users' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ผู้ใช้งาน</a>
+        <a href="?tab=borrow" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'borrow' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">เหตุผลการเบิก</a>
+        <a href="?tab=import" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'import' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">เหตุผลการนำเข้า</a>
+        <a href="?tab=categories" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'categories' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">หมวดหมู่</a>
+        <a href="?tab=product_types" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'product_types' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ประเภทสินค้า</a>
+        <a href="?tab=units" class="btn btn-sm rounded-pill px-3 py-1.5 <?= $active_tab == 'units' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">หน่วยนับ</a>
     </div>
 </div>
 
 <!-- Desktop Sub-navigation for settings tabs (Visible only on large screens) -->
 <div class="d-none d-lg-flex align-items-center justify-content-between gap-2 mb-4">
-    <a href="?tab=buildings" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'buildings' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-building me-1"></i> อาคาร
-    </a>
-    <a href="?tab=floors" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'floors' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-layer-group me-1"></i> ชั้น
-    </a>
-    <a href="?tab=departments" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'departments' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-network-wired me-1"></i> แผนก
-    </a>
-    <a href="?tab=products" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'products' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-boxes me-1"></i> สินค้า
-    </a>
-    <a href="?tab=users" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'users' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-users me-1"></i> ผู้ใช้งาน
-    </a>
-    <a href="?tab=borrow" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'borrow' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-hand-holding-heart me-1"></i> เหตุผลการเบิก
-    </a>
-    <a href="?tab=import" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'import' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-file-import me-1"></i> เหตุผลการนำเข้า
-    </a>
-    <a href="?tab=categories" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'categories' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-tags me-1"></i> หมวดหมู่
-    </a>
-    <a href="?tab=units" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'units' ? 'btn-primary' : 'btn-light text-muted' ?>">
-        <i class="fas fa-balance-scale me-1"></i> หน่วยนับ
-    </a>
+    <a href="?tab=buildings" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'buildings' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">อาคาร</a>
+    <a href="?tab=floors" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'floors' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ชั้น</a>
+    <a href="?tab=departments" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'departments' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">แผนก</a>
+    <a href="?tab=products" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'products' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">สินค้า</a>
+    <a href="?tab=users" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'users' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ผู้ใช้งาน</a>
+    <a href="?tab=borrow" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'borrow' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">เหตุผลการเบิก</a>
+    <a href="?tab=import" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'import' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">เหตุผลการนำเข้า</a>
+    <a href="?tab=categories" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'categories' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">หมวดหมู่</a>
+    <a href="?tab=product_types" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'product_types' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">ประเภทสินค้า</a>
+    <a href="?tab=units" class="btn btn-sm rounded-pill px-3 py-2 <?= $active_tab == 'units' ? 'btn-primary' : 'btn-light text-muted' ?> text-nowrap">หน่วยนับ</a>
 </div>
 
 <div class="tab-content">
@@ -115,7 +121,7 @@ require_once '../includes/header.php';
                 </div>
             </div>
             <div class="table-responsive">
-                <table class="table align-middle table-hover">
+                <table class="table align-middle table-hover small">
                     <thead class="table-light">
                         <tr>
                             <th>สินค้า</th>
@@ -124,6 +130,7 @@ require_once '../includes/header.php';
                             <th class="text-center">ขั้นต่ำ</th>
                             <th class="text-center">คงเหลือ</th>
                             <th class="text-center">สถานะ</th>
+                            <th class="text-center">สัญญาเช่า</th>
                             <th class="text-end">จัดการ</th>
                         </tr>
                     </thead>
@@ -159,18 +166,46 @@ require_once '../includes/header.php';
                                     </span>
                                 <?php endif; ?>
                             </td>
+                            <td class="text-center">
+                                <?php 
+                                if (!empty($p['rental_duration']) && $p['rental_duration'] !== '0000-00-00' && $p['rental_duration'] !== '0' && $p['rental_duration'] !== '1970-01-01') {
+                                    $end_date = new DateTime($p['rental_duration']);
+                                    $now = new DateTime();
+                                    $now->setTime(0, 0, 0);
+                                    $end_date->setTime(0, 0, 0);
+                                    
+                                    if ($end_date < $now) {
+                                        echo '<span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>หมดสัญญา</span>';
+                                    } else {
+                                        $diff = $now->diff($end_date);
+                                        $parts = [];
+                                        if ($diff->y > 0) $parts[] = $diff->y . ' ปี';
+                                        if ($diff->m > 0) $parts[] = $diff->m . ' เดือน';
+                                        if ($diff->d > 0) $parts[] = $diff->d . ' วัน';
+                                        
+                                        $text = empty($parts) ? 'ครบกำหนดวันนี้' : implode(' ', $parts);
+                                        echo '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>' . $text . '</span>';
+                                    }
+                                    echo '<div class="small text-muted mt-1">' . date('d/m/Y', strtotime($p['rental_duration'])) . '</div>';
+                                } else {
+                                    echo '<span class="text-muted small">-</span>';
+                                }
+                                ?>
+                            </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-outline-primary" onclick="editProduct(<?= htmlspecialchars(json_encode($p)) ?>)" title="แก้ไข">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>')" title="ลบ">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button class="btn btn-outline-primary" style="width: 46px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;" onclick="editProduct(<?= htmlspecialchars(json_encode($p)) ?>)" title="แก้ไข">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" style="width: 46px; height: 36px; border-radius: 12px; display: flex; align-items: center; justify-content: center;" onclick="deleteProduct(<?= $p['id'] ?>, '<?= htmlspecialchars($p['name'], ENT_QUOTES) ?>')" title="ลบ">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach; ?>
                         <?php if (empty($products)): ?>
-                        <tr><td colspan="7" class="text-center text-muted py-5">ยังไม่มีสินค้าในระบบ</td></tr>
+                        <tr><td colspan="8" class="text-center text-muted py-5">ยังไม่มีสินค้าในระบบ</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>
@@ -709,6 +744,56 @@ require_once '../includes/header.php';
         </div>
     </div>
 
+    <!-- ====== TAB 8.5: Manage Product Types ====== -->
+    <div class="tab-pane fade <?= $active_tab == 'product_types' ? 'show active' : '' ?>" id="tabProductTypes">
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="card p-4 shadow-sm border-0">
+                    <h6 class="fw-bold mb-3"><i class="fas fa-plus-circle text-primary me-2"></i>เพิ่มประเภทสินค้าใหม่</h6>
+                    <div class="input-group">
+                        <input type="text" id="newProductTypeName" class="form-control" placeholder="พิมพ์ชื่อประเภทสินค้าใหม่...">
+                        <button class="btn btn-primary fw-bold animate-hover" onclick="addProductType()"><i class="fas fa-plus me-1"></i>เพิ่ม</button>
+                    </div>
+                    <?php if (empty($product_types_db)): ?>
+                    <div class="alert alert-warning mt-3 mb-0 small">
+                        <i class="fas fa-exclamation-triangle me-1"></i> ตารางประเภทสินค้ายังไม่ถูกสร้าง หรือไม่มีข้อมูล คุณสามารถใช้งานปุ่ม <strong>"เริ่มสร้างตาราง (Migration)"</strong> เพื่อดึงข้อมูลเดิมได้
+                        <button class="btn btn-sm btn-outline-warning w-100 mt-2" onclick="migrateProductTypes()">เริ่มสร้างตารางและดึงข้อมูล</button>
+                    </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="card p-4 shadow-sm border-0">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0"><i class="fas fa-cubes text-primary me-2"></i>รายการประเภทสินค้าทั้งหมด</h6>
+                        <div class="input-group input-group-sm" style="width: 150px;">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0" placeholder="ค้นหา..." onkeyup="filterList(this, 'productTypeList')">
+                        </div>
+                    </div>
+                    <div id="productTypeList" class="reorder-list">
+                        <?php foreach ($product_types_db as $pt): ?>
+                        <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded mb-2 reason-item" id="product_type-<?= $pt['id'] ?>" data-id="<?= $pt['id'] ?>" style="cursor: grab;">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-grip-vertical text-muted me-3 drag-handle" style="cursor: move;"></i>
+                                <span class="fw-bold"><?= htmlspecialchars($pt['name']) ?></span>
+                            </div>
+                            
+                            <div>
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="editProductType(<?= $pt['id'] ?>, '<?= htmlspecialchars($pt['name'], ENT_QUOTES) ?>')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProductType(<?= $pt['id'] ?>, '<?= htmlspecialchars($pt['name'], ENT_QUOTES) ?>')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                        <?php if (empty($product_types_db)): ?>
+                        <div class="text-center text-muted py-4">ยังไม่มีประเภทสินค้าในระบบ หรือตารางยังไม่ได้สร้าง</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ====== TAB 9: Manage Units ====== -->
     <div class="tab-pane fade <?= $active_tab == 'units' ? 'show active' : '' ?>" id="tabUnits">
         <div class="row g-4">
@@ -757,7 +842,7 @@ require_once '../includes/header.php';
 
 <!-- Edit Product Modal -->
 <div class="modal fade" id="editProductModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content border-0 shadow">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i class="fas fa-box me-2"></i><span id="productModalTitle">แก้ไขสินค้า</span></h5>
@@ -767,7 +852,7 @@ require_once '../includes/header.php';
                 <input type="hidden" id="epId" name="id">
                 <div class="row g-3">
                     <!-- Left: Product Info -->
-                    <div class="col-lg-7">
+                    <div class="col-lg-7" id="epInfoCol">
                         <div class="card p-3 border-0 shadow-sm h-100">
                             <h6 class="fw-bold mb-3 small"><i class="fas fa-info-circle text-primary me-2"></i>ข้อมูลหลักสินค้า</h6>
                             <div class="row g-3">
@@ -776,8 +861,18 @@ require_once '../includes/header.php';
                                     <input type="text" id="epSku" class="form-control form-control-sm scan-focus border-orange bg-orange-light" placeholder="เช่น SKU-001" required>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small fw-bold">ชื่อสินค้า <span class="text-danger">*</span></label>
-                                    <input type="text" id="epName" class="form-control form-control-sm" placeholder="เช่น Logitech G Pro" required>
+                                    <label class="form-label small fw-bold">ประเภทสินค้า <span class="text-danger">*</span></label>
+                                    <select id="epName" class="form-select form-select-sm" onchange="toggleOtherEpProductName(this)" required>
+                                        <option value="">-- เลือกประเภทสินค้า --</option>
+                                        <?php foreach ($product_types as $type): ?>
+                                            <option value="<?= htmlspecialchars($type) ?>"><?= htmlspecialchars($type) ?></option>
+                                        <?php endforeach; ?>
+                                        <option value="อื่นๆ">อื่นๆ (เพิ่มใหม่)</option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="otherEpProductNameContainer" style="display: none;">
+                                    <label class="form-label small fw-bold text-danger">ระบุประเภทสินค้าอื่นๆ <span class="text-danger">*</span></label>
+                                    <input type="text" id="epOtherName" class="form-control form-control-sm border-danger" placeholder="พิมพ์ประเภทสินค้า...">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold">หมวดหมู่ <span class="text-danger">*</span></label>
@@ -801,8 +896,16 @@ require_once '../includes/header.php';
                                     <textarea id="epSpec" class="form-control form-control-sm" rows="2"></textarea>
                                 </div>
                                 <div class="col-md-4">
-                                    <label class="form-label small fw-bold">ราคาต่อหน่วย <span class="text-danger">*</span></label>
+                                    <label class="form-label small fw-bold">ราคาต่อหน่วย (บาท) <span class="text-danger">*</span></label>
                                     <input type="number" step="0.01" id="epPrice" class="form-control form-control-sm" value="0.00" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">ราคาเช่า (บาท)</label>
+                                    <input type="number" step="0.01" id="epRentalPrice" class="form-control form-control-sm" value="0.00">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label small fw-bold">วันสิ้นสุดการเช่า</label>
+                                    <input type="date" id="epRentalDuration" class="form-control form-control-sm" value="">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label small fw-bold">หน่วยนับ <span class="text-danger">*</span></label>
@@ -813,9 +916,26 @@ require_once '../includes/header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-8">
                                     <label class="form-label small fw-bold">แจ้งเตือนขั้นต่ำ <span class="text-danger">*</span></label>
                                     <input type="number" id="epMinAlert" class="form-control form-control-sm" value="5" required>
+                                </div>
+                                <div class="col-12" id="epImportReasonGroup" style="display: none;">
+                                    <label class="form-label small fw-bold">เหตุผลการนำเข้า <span class="text-danger">*</span></label>
+                                    <select id="epImportReason" class="form-select form-select-sm" onchange="toggleOtherEpImportReason(this)">
+                                        <option value="">-- เลือกเหตุผลการนำเข้า --</option>
+                                        <?php foreach ($import_reasons as $ir): ?>
+                                            <option value="<?= htmlspecialchars($ir['label']) ?>"><?= htmlspecialchars($ir['label']) ?></option>
+                                        <?php endforeach; ?>
+                                        <option value="อื่นๆ">อื่นๆ (ระบุเอง)</option>
+                                    </select>
+                                </div>
+                                <div class="col-12" id="otherEpImportReasonContainer" style="display: none;">
+                                    <input type="text" id="epOtherImportReason" class="form-control form-control-sm border-danger" placeholder="ระบุเหตุผลเพิ่มเติม...">
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label small fw-bold">หมายเหตุ (ถ้ามี)</label>
+                                    <textarea id="epRemark" class="form-control form-control-sm" rows="2" placeholder="ใส่หมายเหตุเพิ่มเติม..."></textarea>
                                 </div>
                                 <div class="col-md-8">
                                     <label class="form-label small fw-bold">รูปสินค้า <span class="text-danger">*</span></label>
@@ -836,6 +956,8 @@ require_once '../includes/header.php';
                                 <h6 class="fw-bold mb-0 small"><i class="fas fa-barcode text-primary me-2"></i>ยิง Serial / Barcode แยกชิ้น</h6>
                                 <span class="badge bg-primary rounded-pill" id="epSerialCount">0</span>
                             </div>
+
+
                             
                             <div class="mb-3">
                                 <div class="input-group input-group-sm">
@@ -1013,40 +1135,182 @@ require_once '../includes/header.php';
         updateEpSerialList();
     });
 
+    // ===== Auto-English Keyboard Layout Conversion Logic =====
+    function enableAutoEnglishInput(selector) {
+        const codeToChar = {
+            'KeyQ': 'q', 'KeyW': 'w', 'KeyE': 'e', 'KeyR': 'r', 'KeyT': 't', 'KeyY': 'y', 'KeyU': 'u', 'KeyI': 'i', 'KeyO': 'o', 'KeyP': 'p',
+            'KeyA': 'a', 'KeyS': 's', 'KeyD': 'd', 'KeyF': 'f', 'KeyG': 'g', 'KeyH': 'h', 'KeyJ': 'j', 'KeyK': 'k', 'KeyL': 'l',
+            'KeyZ': 'z', 'KeyX': 'x', 'KeyC': 'c', 'KeyV': 'v', 'KeyB': 'b', 'KeyN': 'n', 'KeyM': 'm',
+            'Digit1': '1', 'Digit2': '2', 'Digit3': '3', 'Digit4': '4', 'Digit5': '5', 'Digit6': '6', 'Digit7': '7', 'Digit8': '8', 'Digit9': '9', 'Digit0': '0',
+            'Minus': '-', 'Equal': '=', 'BracketLeft': '[', 'BracketRight': ']', 'Backslash': '\\',
+            'Semicolon': ';', 'Quote': "'", 'Comma': ',', 'Period': '.', 'Slash': '/'
+        };
+
+        const codeToCharShift = {
+            'KeyQ': 'Q', 'KeyW': 'W', 'KeyE': 'E', 'KeyR': 'R', 'KeyT': 'T', 'KeyY': 'Y', 'KeyU': 'U', 'KeyI': 'I', 'KeyO': 'O', 'KeyP': 'P',
+            'KeyA': 'A', 'KeyS': 'S', 'KeyD': 'D', 'KeyF': 'F', 'KeyG': 'G', 'KeyH': 'H', 'KeyJ': 'J', 'KeyK': 'K', 'KeyL': 'L',
+            'KeyZ': 'Z', 'KeyX': 'X', 'KeyC': 'C', 'KeyV': 'V', 'KeyB': 'B', 'KeyN': 'N', 'KeyM': 'M',
+            'Digit1': '!', 'Digit2': '@', 'Digit3': '#', 'Digit4': '$', 'Digit5': '%', 'Digit6': '^', 'Digit7': '&', 'Digit8': '*', 'Digit9': '(', 'Digit0': ')',
+            'Minus': '_', 'Equal': '+', 'BracketLeft': '{', 'BracketRight': '}', 'Backslash': '|',
+            'Semicolon': ':', 'Quote': '"', 'Comma': '<', 'Period': '>', 'Slash': '?'
+        };
+
+        const thaiToEngMap = {
+            'ๆ': 'q', 'ไ': 'w', 'ำ': 'e', 'พ': 'r', 'ะ': 't', 'ั': 'y', 'ี': 'u', 'ร': 'i', 'น': 'o', 'ย': 'p', 'บ': '[', 'ล': ']', 'ฃ': '\\',
+            'ฟ': 'a', 'ห': 's', 'ก': 'd', 'ด': 'f', 'เ': 'g', '้': 'h', '่': 'j', 'า': 'k', 'ส': 'l', 'ว': ';', 'ง': "'",
+            'ผ': 'z', 'ป': 'x', 'แ': 'c', 'อ': 'v', 'ิ': 'b', 'ื': 'n', 'ท': 'm', 'ม': ',', 'ใ': '.', 'ฝ': '/',
+            'ๅ': '1', '/': '2', '_': '3', 'ภ': '4', 'ถ': '5', 'ุ': '6', 'ึ': '7', 'ค': '8', 'ต': '9', 'จ': '0', 'ข': '-', 'ช': '=',
+            '๐': 'Q', '"': 'W', 'ฎ': 'E', 'ฏ': 'R', 'ธ': 'T', 'ํ': 'Y', '๊': 'U', 'ณ': 'I', 'ฯ': 'O', 'ญ': 'P', 'ฐ': '{', '': '}',
+            'ฤ': 'A', 'ฆ': 'S', 'ฏ': 'D', 'ฌ': 'F', '็': 'G', '๋': 'H', 'ษ': 'K', 'ศ': 'L', 'ซ': ':', 'ง': '"',
+            'ผ': 'Z', 'ป': 'X', 'ฉ': 'C', 'ฮ': 'V', 'ิ': 'B', 'ื': 'N', 'ท': 'M', 'ม': '<', 'ใ': '>', 'ฝ': '?',
+            '+': '!', '๑': '@', '๒': '#', '๓': '$', '๔': '%', 'ู': '^', '฿': '&', '๕': '*', '๖': '(', '๗': ')',
+            '๘': '_', '๙': '+'
+        };
+
+        $(document).on('keydown', selector, function(e) {
+            if (e.ctrlKey || e.altKey || e.metaKey || e.key === 'Tab' || e.key === 'Enter' || e.key === 'Backspace' || e.key.startsWith('Arrow')) {
+                return;
+            }
+
+            const code = e.originalEvent.code;
+            const mappedChar = e.shiftKey ? codeToCharShift[code] : codeToChar[code];
+
+            if (mappedChar !== undefined) {
+                e.preventDefault();
+                
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                const val = $(this).val();
+                const newVal = val.substring(0, start) + mappedChar + val.substring(end);
+                $(this).val(newVal);
+                
+                this.selectionStart = this.selectionEnd = start + 1;
+                $(this).trigger('input');
+            }
+        });
+
+        $(document).on('input', selector, function() {
+            const val = $(this).val();
+            let newVal = '';
+            let hasThai = false;
+            
+            for (let i = 0; i < val.length; i++) {
+                const char = val[i];
+                if (thaiToEngMap[char] !== undefined) {
+                    newVal += thaiToEngMap[char];
+                    hasThai = true;
+                } else {
+                    newVal += char;
+                }
+            }
+            
+            if (hasThai) {
+                const start = this.selectionStart;
+                $(this).val(newVal);
+                this.selectionStart = this.selectionEnd = start;
+            }
+        });
+    }
+
+    enableAutoEnglishInput('#epSku');
+    enableAutoEnglishInput('#epSerialInput');
+
+    function processEpSerial(code) {
+        if (!code || code.length < 3) return;
+        
+        if (epSerials.has(code)) {
+            Swal.fire({ icon: 'warning', title: 'Serial ซ้ำ', text: 'คุณสแกน Serial นี้ไปแล้ว', timer: 1000, showConfirmButton: false });
+            return;
+        }
+
+        // Check DB for Serial
+        fetch('ajax_manage_settings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'check_serial', serial: code })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success && res.exists) {
+                Swal.fire({ icon: 'warning', title: 'มีในฐานข้อมูลแล้ว', text: 'Serial นี้ถูกใช้งานแล้วในสินค้า: ' + res.serial.name });
+            } else {
+                epSerials.add(code);
+                updateEpSerialList();
+            }
+        });
+    }
+
     $('#epSerialInput').on('keydown', function(e) {
         if (e.which === 13) {
             e.preventDefault();
-            const code = $(this).val().trim();
-            if (code.length > 2) {
-                if (!epSerials.has(code)) {
-                    epSerials.add(code);
-                    updateEpSerialList();
-                    $(this).val('').focus();
-                } else {
-                    Swal.fire({ icon: 'warning', title: 'Serial ซ้ำ', timer: 1000, showConfirmButton: false });
-                }
-            }
+            let code = $(this).val().trim();
+            $(this).val('').focus();
+            processEpSerial(code);
         }
+    });
+
+    function checkSkuExists(sku) {
+        if (!sku) return;
+        var currentId = document.getElementById('epId').value;
+        fetch('ajax_manage_settings.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'check_sku', sku: sku, exclude_id: currentId })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success && res.exists) {
+                Swal.fire({ icon: 'warning', title: 'มีในฐานข้อมูลแล้ว', text: 'SKU นี้ถูกใช้งานแล้วในสินค้า: ' + res.product.name });
+                $('#epSku').val('').focus();
+            }
+        });
+    }
+
+    $('#epSku').on('keydown', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            checkSkuExists($(this).val().trim());
+        }
+    });
+
+    // Also check SKU when user types manually and clicks away
+    $('#epSku').on('change', function() {
+        checkSkuExists($(this).val().trim());
+    });
+
+    // Auto-focus SKU input when modal opens
+    document.getElementById('editProductModal').addEventListener('shown.bs.modal', function () {
+        document.getElementById('epSku').focus();
     });
 
     function addProduct() {
         document.getElementById('productModalTitle').innerText = 'เพิ่มสินค้าใหม่';
         document.getElementById('epId').value = '';
         document.getElementById('epName').value = '';
+        document.getElementById('epOtherName').value = '';
+        document.getElementById('otherEpProductNameContainer').style.display = 'none';
         document.getElementById('epSku').value = '';
         document.getElementById('epBrand').value = '';
         document.getElementById('epModel').value = '';
         document.getElementById('epCategory').value = 'IT';
         document.getElementById('epSpec').value = '';
         document.getElementById('epPrice').value = '0.00';
+        document.getElementById('epRentalPrice').value = '0.00';
+        document.getElementById('epRentalDuration').value = '';
         document.getElementById('epUnit').value = 'ชิ้น';
         document.getElementById('epMinAlert').value = 5;
+        document.getElementById('epRemark').value = '';
+        document.getElementById('epImportReasonGroup').style.display = 'block';
+        document.getElementById('epImportReason').value = '';
+        document.getElementById('epOtherImportReason').value = '';
+        document.getElementById('otherEpImportReasonContainer').style.display = 'none';
         document.getElementById('epImagePreview').innerHTML = '<span class="text-muted" style="font-size: 10px;">ไม่มีรูป</span>';
         document.getElementById('epImage').value = '';
         document.getElementById('epImage').required = true;
         
         epSerials.clear();
         updateEpSerialList();
+        document.getElementById('epInfoCol').className = 'col-lg-7';
         document.getElementById('epSerialCol').style.display = 'block';
 
         new bootstrap.Modal(document.getElementById('editProductModal')).show();
@@ -1055,17 +1319,36 @@ require_once '../includes/header.php';
     function editProduct(p) {
         document.getElementById('productModalTitle').innerText = 'แก้ไขสินค้า';
         document.getElementById('epId').value = p.id;
-        document.getElementById('epName').value = p.name || '';
+        var nameVal = p.name || '';
+        var selectName = document.getElementById('epName');
+        var nameExists = Array.from(selectName.options).some(opt => opt.value === nameVal);
+        
+        if (nameExists) {
+            selectName.value = nameVal;
+            document.getElementById('otherEpProductNameContainer').style.display = 'none';
+            document.getElementById('epOtherName').value = '';
+        } else {
+            selectName.value = 'อื่นๆ';
+            document.getElementById('otherEpProductNameContainer').style.display = 'block';
+            document.getElementById('epOtherName').value = nameVal;
+        }
+
         document.getElementById('epSku').value = p.sku || '';
         document.getElementById('epBrand').value = p.brand || '';
         document.getElementById('epModel').value = p.model || '';
         document.getElementById('epCategory').value = p.category || 'IT';
         document.getElementById('epSpec').value = p.spec || '';
         document.getElementById('epPrice').value = p.price || '0.00';
+        document.getElementById('epRentalPrice').value = p.rental_price || '0.00';
+        document.getElementById('epRentalDuration').value = p.rental_duration || '';
         document.getElementById('epUnit').value = p.unit || 'ชิ้น';
         document.getElementById('epMinAlert').value = p.min_alert || 0;
+        document.getElementById('epRemark').value = p.remark || '';
         
+        document.getElementById('epInfoCol').className = 'col-lg-12';
         document.getElementById('epSerialCol').style.display = 'none';
+        document.getElementById('epImportReasonGroup').style.display = 'none';
+        document.getElementById('otherEpImportReasonContainer').style.display = 'none';
         
         // Image preview
         var preview = document.getElementById('epImagePreview');
@@ -1085,18 +1368,34 @@ require_once '../includes/header.php';
         var id = document.getElementById('epId').value;
         formData.append('action', id ? 'edit_product' : 'add_product');
         formData.append('id', id);
-        formData.append('name', document.getElementById('epName').value.trim());
+        var nameVal = document.getElementById('epName').value;
+        if (nameVal === 'อื่นๆ') {
+            nameVal = document.getElementById('epOtherName').value.trim();
+        }
+        formData.append('name', nameVal);
         formData.append('sku', document.getElementById('epSku').value.trim());
         formData.append('brand', document.getElementById('epBrand').value.trim());
         formData.append('model', document.getElementById('epModel').value.trim());
         formData.append('category', document.getElementById('epCategory').value.trim());
         formData.append('spec', document.getElementById('epSpec').value.trim());
         formData.append('price', document.getElementById('epPrice').value);
+        formData.append('rental_price', document.getElementById('epRentalPrice').value);
+        formData.append('rental_duration', document.getElementById('epRentalDuration').value);
         formData.append('unit', document.getElementById('epUnit').value.trim());
         formData.append('min_alert', document.getElementById('epMinAlert').value);
+        formData.append('remark', document.getElementById('epRemark').value.trim());
         
         if (epSerials.size > 0) {
             formData.append('serials', Array.from(epSerials).join(','));
+            var importReason = document.getElementById('epImportReason').value;
+            if (importReason === 'อื่นๆ') {
+                importReason = document.getElementById('epOtherImportReason').value.trim();
+            }
+            if (!importReason) {
+                Swal.fire({ icon: 'warning', title: 'ข้อมูลไม่ครบ', text: 'กรุณาระบุเหตุผลการนำเข้า' });
+                return;
+            }
+            formData.append('import_reason', importReason);
         }
         
         var imageInput = document.getElementById('epImage');
@@ -1126,6 +1425,18 @@ require_once '../includes/header.php';
                 fetchAction({ action: 'delete_product', id: id });
             }
         });
+    }
+
+    function toggleOtherEpProductName(el) {
+        var container = document.getElementById('otherEpProductNameContainer');
+        var input = document.getElementById('epOtherName');
+        if (el.value === 'อื่นๆ') {
+            container.style.display = 'block';
+            input.focus();
+        } else {
+            container.style.display = 'none';
+            input.value = '';
+        }
     }
 
     // ===== REASON MANAGEMENT =====
@@ -1405,6 +1716,67 @@ require_once '../includes/header.php';
         }).then(function(result) {
             if (result.isConfirmed) {
                 fetchAction({ action: 'delete_category', id: id });
+            }
+        });
+    }
+
+    // ===== PRODUCT TYPE MANAGEMENT =====
+    function addProductType() {
+        var name = document.getElementById('newProductTypeName').value.trim();
+        if (!name) {
+            Swal.fire({ icon: 'warning', title: 'กรุณากรอกชื่อประเภทสินค้า' });
+            return;
+        }
+        fetchAction({ action: 'add_product_type', name: name });
+    }
+
+    function editProductType(id, oldName) {
+        Swal.fire({
+            title: 'แก้ไขชื่อประเภทสินค้า',
+            input: 'text',
+            inputValue: oldName,
+            showCancelButton: true,
+            confirmButtonText: 'บันทึก',
+            cancelButtonText: 'ยกเลิก',
+            inputValidator: function(value) { if (!value) return 'กรุณากรอกชื่อประเภทสินค้า'; }
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                fetchAction({ action: 'edit_product_type', id: id, name: result.value });
+            }
+        });
+    }
+
+    function deleteProductType(id, name) {
+        Swal.fire({
+            title: 'ยืนยันการลบ?',
+            html: 'ต้องการลบประเภทสินค้า <strong>' + name + '</strong> ?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            confirmButtonText: 'ลบ',
+            cancelButtonText: 'ยกเลิก'
+        }).then(function(result) {
+            if (result.isConfirmed) {
+                fetchAction({ action: 'delete_product_type', id: id });
+            }
+        });
+    }
+
+    function migrateProductTypes() {
+        Swal.fire({
+            title: 'ยืนยันการสร้างตาราง?',
+            text: 'ระบบจะสร้างตารางและดึงข้อมูลประเภทสินค้าจากฐานข้อมูลเดิม',
+            icon: 'info',
+            showCancelButton: true,
+            confirmButtonText: 'เริ่มสร้าง',
+            cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('../migrate_product_types.php')
+                .then(r => r.text())
+                .then(data => {
+                    Swal.fire('สำเร็จ', data, 'success').then(() => location.reload());
+                }).catch(e => Swal.fire('Error', e.toString(), 'error'));
             }
         });
     }

@@ -211,7 +211,7 @@ require_once '../includes/header.php';
         border-radius: 12px;
         padding: 1rem;
         display: grid;
-        grid-template-columns: 2.2fr 1.8fr 1.2fr 1.2fr 0.6fr;
+        grid-template-columns: 2.5fr 2fr 1.5fr 0.6fr;
         align-items: center;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
         transition: transform 0.15s ease;
@@ -290,7 +290,7 @@ require_once '../includes/header.php';
     /* Table columns headers align with custom cards */
     .card-list-headers {
         display: grid;
-        grid-template-columns: 2.2fr 1.8fr 1.2fr 1.2fr 0.6fr;
+        grid-template-columns: 2.5fr 2fr 1.5fr 0.6fr;
         padding: 0.5rem 1rem;
         font-size: 0.8rem;
         font-weight: 700;
@@ -521,7 +521,6 @@ require_once '../includes/header.php';
             <div class="card-list-headers">
                 <div>สินค้า</div>
                 <div>SERIAL / BARCODE</div>
-                <div>ราคา</div>
                 <div>สถานะ</div>
                 <div class="text-end" style="padding-right: 12px;">จัดการ</div>
             </div>
@@ -899,8 +898,13 @@ require_once '../includes/header.php';
                                         <div class="text-muted small">${item.brand} ${item.model}</div>
                                     </div>
                                 </div>
-                                <div class="serial-text"><code>${code}</code></div>
-                                <div class="price-text">฿${parseFloat(item.price).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                                <div>
+                                    <div class="serial-text"><code>${code}</code></div>
+                                    <div class="price-text mt-1" style="font-size: 0.85rem;">
+                                        ฿${parseFloat(item.price).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                        ${item.rental_price > 0 ? `<br><span class="text-success" style="font-size: 0.75rem;"><i class="fas fa-tags"></i> เช่า: ฿${parseFloat(item.rental_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>` : ''}
+                                    </div>
+                                </div>
                                 <div class="status-group">
                                     <span class="status-title" style="color: ${statusColor};">${statusText}</span>
                                     <span class="status-time">${statusSubtext}</span>
@@ -1086,6 +1090,20 @@ require_once '../includes/header.php';
                     $(`#row-${k}`).remove();
                 }
             });
+            // Also remove any borrowed-status rows in DOM that aren't in selectedSerials
+            // (e.g. from asset number search results)
+            $('#borrowList .scanned-item-card').each(function() {
+                const rowId = $(this).attr('id');
+                if (!rowId) return;
+                const rowCode = rowId.replace('row-', '');
+                // If this row is not in selectedSerials AND has "ถูกเบิก" status, remove it
+                if (!selectedSerials.has(rowCode)) {
+                    const statusEl = $(this).find('.status-title');
+                    if (statusEl.length && statusEl.text().trim() === 'ถูกเบิก') {
+                        $(this).remove();
+                    }
+                }
+            });
             updateUI();
 
             if (selectedSerials.has(code)) {
@@ -1203,8 +1221,13 @@ require_once '../includes/header.php';
                                         <div class="text-muted small">${res.data.brand} ${res.data.model}</div>
                                     </div>
                                 </div>
-                                <div class="serial-text"><code>${code}</code></div>
-                                <div class="price-text">฿${parseFloat(res.data.price).toLocaleString(undefined, {minimumFractionDigits: 2})}</div>
+                                <div>
+                                    <div class="serial-text"><code>${code}</code></div>
+                                    <div class="price-text mt-1" style="font-size: 0.85rem;">
+                                        ฿${parseFloat(res.data.price).toLocaleString(undefined, {minimumFractionDigits: 2})}
+                                        ${res.data.rental_price > 0 ? `<br><span class="text-success" style="font-size: 0.75rem;"><i class="fas fa-tags"></i> เช่า: ฿${parseFloat(res.data.rental_price).toLocaleString(undefined, {minimumFractionDigits: 2})}</span>` : ''}
+                                    </div>
+                                </div>
                                 <div class="status-group">
                                     <span class="status-title" style="color: ${statusColor};">${statusText}</span>
                                     <span class="status-time">${statusSubtext}</span>

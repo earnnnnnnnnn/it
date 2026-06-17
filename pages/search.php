@@ -72,7 +72,7 @@ require_once '../includes/header.php';
                                 <th>เลขครุภัณฑ์ / Serial</th>
                                 <th class="text-center">สถานะ</th>
                                 <th>ผู้ถือครอง / สถานที่</th>
-                                <th class="text-end">ราคา</th>
+                                <th class="text-end" style="white-space: nowrap;">ราคา<br><span class="text-muted small fw-normal">ราคาเช่า</span></th>
                                 <th>วันที่เบิก</th>
                             </tr>
                         </thead>
@@ -449,7 +449,7 @@ require_once '../includes/header.php';
                 "type": "POST"
             },
             "columns": [
-                { "orderable": true },
+                { "orderable": false },
                 { "orderable": true },
                 { "orderable": true, "className": "text-center" },
                 { "orderable": true },
