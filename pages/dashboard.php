@@ -360,8 +360,8 @@ require_once '../includes/header.php';
                                     <td><div class='fw-bold text-dark'>{$row['p_name']}</div></td>
                                     <td><code>{$row['serial_code']}</code></td>
                                     <td>
-                                        <div class='text-primary fw-bold mb-1'>฿" . number_format($row['price'], 2) . "</div>\" . 
-                                        (($row['rental_price'] ?? 0) > 0 ? \"<div class='text-success fw-bold' style='font-size: 0.85rem;'>เช่า: ฿\" . number_format($row['rental_price'], 2) . \"</div>\" : \"\") . \"
+                                        <div class='text-primary fw-bold mb-1'>฿" . number_format($row['price'], 2) . "</div>" . 
+                                        (($row['rental_price'] ?? 0) > 0 ? "<div class='text-success fw-bold' style='font-size: 0.85rem;'>เช่า: ฿" . number_format($row['rental_price'], 2) . "</div>" : "") . "
                                     </td>
                                     <td><span class='text-muted small'>{$row['asset_number']}</span></td>
                                     <td><i class='fas fa-user-circle text-muted me-1'></i> {$row['u_name']}</td>
