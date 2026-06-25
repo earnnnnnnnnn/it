@@ -211,7 +211,7 @@ $(document).ready(function() {
     });
 
     $('#btnInventoryExcel').on('click', function() {
-        inventoryTable.button('.buttons-excel').trigger();
+        window.location.href = 'export_inventory_excel.php';
     });
 });
 </script>
